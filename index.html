@@ -2598,27 +2598,9 @@
         const fee = Number(document.getElementById("mfFee").value);
         const joiningDate = document.getElementById("mfJoiningDate").value;
 
-        // --- validation ---
-        if (!name || name.length < 2) {
-          toast("Please enter a valid name", "error"); return;
+        if (!name || whatsapp.length !== 10 || !fee || !joiningDate) {
+          toast("Please fill all fields correctly", "error"); return;
         }
-        if (!/^[6-9]\d{9}$/.test(whatsapp)) {
-          toast("Enter a valid 10-digit WhatsApp number", "error"); return;
-        }
-        if (!fee || fee <= 0 || fee > 1000000) {
-          toast("Fee must be a positive amount", "error"); return;
-        }
-        if (!joiningDate) {
-          toast("Please pick a joining date", "error"); return;
-        }
-        if (joiningDate > todayISO()) {
-          toast("Joining date can't be in the future", "error"); return;
-        }
-        const dup = members.find(m => m.whatsapp === whatsapp && m.id !== id);
-        if (dup) {
-          toast(`This number is already used by ${dup.name}`, "error"); return;
-        }
-        // --- end validation ---
 
 
         if (id) {
@@ -2739,23 +2721,7 @@
         const paidOn = document.getElementById("smpPaidOn").value || todayISO();
         const periodStart = document.getElementById("smpPeriodStart").value || m.nextDueDate;
         const periodEnd = document.getElementById("smpPeriodEnd").value || addMonthsISO(periodStart, 1);
-        // --- validation ---
-        if (!amountRaw || isNaN(amount) || amount <= 0) {
-          toast("Enter a valid payment amount", "error"); return;
-        }
-        if (!paidOn) {
-          toast("Please select a payment date", "error"); return;
-        }
-        if (paidOn > todayISO()) {
-          toast("Payment date can't be in the future", "error"); return;
-        }
-        if (!periodStart || !periodEnd) {
-          toast("Period dates are missing", "error"); return;
-        }
-        if (periodEnd <= periodStart) {
-          toast("Period end must be after period start", "error"); return;
-        }
-        // --- end validation ---
+
         if (periodEnd <= periodStart) {
           toast("Period end must be after period start", "error");
           return;
@@ -2964,8 +2930,7 @@
       document.getElementById("profileSaveBtn").addEventListener("click", () => {
         const name = document.getElementById("profileGymName").value.trim();
         const phone = cleanPhone(document.getElementById("profilePhone").value);
-        if (!name || name.length < 2) { toast("Enter a valid gym name", "error"); return; }
-        if (!/^[6-9]\d{9}$/.test(phone)) { toast("Enter a valid 10-digit phone number", "error"); return; }
+        if (!name || phone.length !== 10) { toast("Enter a valid gym name and number", "error"); return; }
         settings.gymName = name; settings.ownerPhone = phone;
         saveSettings(settings); closeSheets(); renderSettings(); renderDashboard();
         toast("Profile updated");
@@ -2975,10 +2940,7 @@
         openSheet("sheetTemplate");
       });
       document.getElementById("templateSaveBtn").addEventListener("click", () => {
-        const val = document.getElementById("templateTextarea").value.trim();
-        if (!val) { toast("Template can't be empty", "error"); return; }
-        if (!val.includes("{name}")) { toast("Template should include {name}", "error"); return; }
-        settings.template = val;
+        settings.template = document.getElementById("templateTextarea").value.trim() || settings.template;
         saveSettings(settings); closeSheets(); toast("Message template saved");
       });
 
