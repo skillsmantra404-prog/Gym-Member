@@ -1679,6 +1679,8 @@
             <button class="chip active" data-rfilter="overdue">Overdue <span class="chip__count"
                 id="rcOverdue">0</span></button>
             <button class="chip" data-rfilter="due">Due Today <span class="chip__count" id="rcDue">0</span></button>
+            <button class="chip" data-rfilter="upcoming">Due Soon <span class="chip__count"
+                id="rcUpcoming">0</span></button>
             <button class="chip" data-rfilter="all">All Unpaid <span class="chip__count" id="rcAll">0</span></button>
           </div>
         </div>
@@ -1797,7 +1799,7 @@
                 data</span><span class="list-item__desc">Permanently delete everything</span></span>
           </button>
         </div>
-        <div class="app-version">Gym Manager · Works fully offline · v1.0.1</div>
+        <div class="app-version">Gym Manager · Works fully offline · v1.0.2</div>
       </section>
     </main>
 
@@ -1873,7 +1875,7 @@
           <label class="field__label">Monthly fee</label>
           <div class="field__prefix-input">
             <span class="field__prefix">₹</span>
-            <input id="mfFee" type="number" inputmode="decimal" placeholder="1000" min="0" step="1" required>
+            <input id="mfFee" type="number" inputmode="decimal" placeholder="1000" min="1" step="1" required>
           </div>
         </div>
         <div class="field">
@@ -2105,7 +2107,7 @@
       <div class="field">
         <label class="field__label">Amount received</label>
         <div class="field__prefix-input"><span class="field__prefix">₹</span><input id="smpAmount" type="number"
-            inputmode="decimal" min="0" step="1"></div>
+            inputmode="decimal" min="1" step="1"></div>
       </div>
       <div class="field">
         <label class="field__label">Paid on</label>
@@ -2116,10 +2118,14 @@
         <input class="field__input" id="smpPeriodStart" type="date">
       </div>
       <div class="field">
-        <label class="field__label">Period covered — end / next due date</label>
+        <label class="field__label">Period covered — end (last day covered)</label>
         <input class="field__input" id="smpPeriodEnd" type="date">
-        <div class="field__hint">Pre-filled automatically (one month from the current due date). Edit any of these
-          if the auto-calculated dates aren't right for this payment.</div>
+      </div>
+      <div class="field">
+        <label class="field__label">Next due date</label>
+        <input class="field__input" id="smpNextDueDate" type="date">
+        <div class="field__hint">All dates are pre-filled automatically based on the billing rule and the current
+          due date. Edit any of them if they aren't right for this payment.</div>
       </div>
       <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
           class="btn btn--primary" id="smpConfirmBtn">Confirm</button></div>
@@ -2218,6 +2224,11 @@
       const LS_MEMBERS = "gym_members_v1";
       const LS_SETTINGS = "gym_settings_v1";
 
+      // How many days before the due date a member shows up under the
+      // Reminders tab's "Due Soon" chip. E.g. fee date 1/08 -> shows up
+      // from 29/07 onward.
+      const REMINDER_ADVANCE_DAYS = 3;
+
       function loadMembers() { try { return JSON.parse(localStorage.getItem(LS_MEMBERS)) || []; } catch (e) { return []; } }
       function saveMembers(list) { localStorage.setItem(LS_MEMBERS, JSON.stringify(list)); }
       function loadSettings() {
@@ -2255,6 +2266,7 @@
         return `${y}-${m}-${day}`;
       }
       function todayISO() { return toLocalISO(new Date()); }
+      function isValidISODate(s) { return typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(new Date(s + "T00:00:00").getTime()); }
       function fmtDate(iso) {
         if (!iso) return "—";
         const d = new Date(iso + "T00:00:00");
@@ -2286,6 +2298,7 @@
       }
       function escapeHtml(s) { return (s || "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
       function cleanPhone(v) { return (v || "").replace(/\D/g, "").slice(-10); }
+      function isValidIndianMobile(v) { return /^[6-9]\d{9}$/.test(v || ""); }
 
       // Last calendar day of the month that contains the given ISO date.
       function endOfMonthISO(iso) {
@@ -2302,28 +2315,35 @@
       // period and next due date come out the same, because the billing
       // cycle itself hasn't shifted — only how late they were in paying it.
       //
+      // periodEnd is the LAST DAY ACTUALLY COVERED (inclusive) — e.g. due
+      // 5/08, pay any time -> period 5/08 to 4/09, next due 5/09. If they
+      // were overdue (due was 1/08, paid 5/08) -> period 1/08 to 31/08,
+      // next due 1/09. periodEnd is never the same calendar day as the
+      // next due date; nextDueDate is always periodEnd + 1 day.
+      //
       // Follows whichever billing rule is set in Settings -> Billing:
       //   "anniversary" (default): period runs from the existing due date
-      //     for one calendar month, e.g. due 4 Aug -> period 4 Aug - 4 Sept,
-      //     next due 4 Sept (matches the member's own join-date cycle).
-      //     This holds even if they actually pay on 8 Aug (4 days late) —
-      //     the period and next due date are unaffected by the late payment.
+      //     for one calendar month.
       //   "fixedday": every period starts on a fixed day-of-month you
       //     configure, useful for gyms that bill everyone on the same date
       //     regardless of when they joined or paid.
       function computeBillingPeriod(currentDueDateISO, paidOnISO) {
+        let periodStart, cycleStart;
         if (settings.billingRule === "fixedday") {
           const day = Math.min(28, Math.max(1, Number(settings.billingFixedDay) || 1));
           const base = new Date(currentDueDateISO + "T00:00:00");
           base.setDate(day);
-          const periodStart = toLocalISO(base);
-          const periodEnd = addMonthsISO(periodStart, 1);
-          return { periodStart, periodEnd };
+          periodStart = toLocalISO(base);
+          cycleStart = addMonthsISO(periodStart, 1);
+        } else {
+          // anniversary (default)
+          periodStart = currentDueDateISO;
+          cycleStart = addMonthsISO(currentDueDateISO, 1);
         }
-        // anniversary (default)
-        const periodStart = currentDueDateISO;
-        const periodEnd = addMonthsISO(currentDueDateISO, 1);
-        return { periodStart, periodEnd };
+        // periodEnd = last day actually covered (inclusive), one day before
+        // the next cycle starts. nextDueDate = the day the next cycle starts.
+        const periodEnd = addDaysISO(cycleStart, -1);
+        return { periodStart, periodEnd, nextDueDate: cycleStart };
       }
 
       function memberStatus(m) {
@@ -2457,14 +2477,14 @@
         const list = (m.payments || []).slice().sort((a, b) => b.paidOn.localeCompare(a.paidOn));
         return list[0] || null;
       }
+      const WHATSAPP_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.1.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.5.1-.2 0-.4 0-.5C10 9 9.5 7.6 9.3 7c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>';
+      const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>';
       function rowActionBtnHtml(m) {
         const st = memberStatus(m);
         if (st === "due" || st === "overdue") {
           const sentToday = m.lastReminderSentOn === todayISO();
           return `<button class="row-action-btn ${sentToday ? 'row-action-btn--sent' : 'row-action-btn--whatsapp'}" data-remind-id="${m.id}" aria-label="Send reminder">
-      ${sentToday
-              ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>'
-              : '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.1.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.5.1-.2 0-.4 0-.5C10 9 9.5 7.6 9.3 7c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>'}
+      ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
     </button>`;
         }
         if (st === "paid") {
@@ -2598,10 +2618,27 @@
         const fee = Number(document.getElementById("mfFee").value);
         const joiningDate = document.getElementById("mfJoiningDate").value;
 
-        if (!name || whatsapp.length !== 10 || !fee || !joiningDate) {
-          toast("Please fill all fields correctly", "error"); return;
+        // --- validation ---
+        if (!name || name.length < 2) {
+          toast("Please enter a valid name", "error"); return;
         }
-
+        if (!isValidIndianMobile(whatsapp)) {
+          toast("Enter a valid 10-digit WhatsApp number", "error"); return;
+        }
+        if (!fee || fee <= 0 || fee > 1000000) {
+          toast("Fee must be a positive amount", "error"); return;
+        }
+        if (!isValidISODate(joiningDate)) {
+          toast("Please pick a valid joining date", "error"); return;
+        }
+        if (joiningDate > todayISO()) {
+          toast("Joining date can't be in the future", "error"); return;
+        }
+        const dup = members.find(x => x.whatsapp === whatsapp && x.id !== id);
+        if (dup) {
+          toast(`This number is already used by ${dup.name}`, "error"); return;
+        }
+        // --- end validation ---
 
         if (id) {
           const m = members.find(x => x.id === id);
@@ -2696,9 +2733,10 @@
       function refreshMarkPaidPreview() {
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
         const paidOn = document.getElementById("smpPaidOn").value || todayISO();
-        const { periodStart, periodEnd } = computeBillingPeriod(m.nextDueDate, paidOn);
+        const { periodStart, periodEnd, nextDueDate } = computeBillingPeriod(m.nextDueDate, paidOn);
         document.getElementById("smpPeriodStart").value = periodStart;
         document.getElementById("smpPeriodEnd").value = periodEnd;
+        document.getElementById("smpNextDueDate").value = nextDueDate;
       }
       document.getElementById("mdMarkPaid").addEventListener("click", () => {
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
@@ -2715,26 +2753,50 @@
         openSheet("sheetMarkPaid");
       });
       document.getElementById("smpPaidOn").addEventListener("change", refreshMarkPaidPreview);
+      // If the user manually edits "period end", keep the next-due-date
+      // field in sync by default (still fully overridable afterwards).
+      document.getElementById("smpPeriodEnd").addEventListener("change", () => {
+        const pe = document.getElementById("smpPeriodEnd").value;
+        if (isValidISODate(pe)) document.getElementById("smpNextDueDate").value = addDaysISO(pe, 1);
+      });
       document.getElementById("smpConfirmBtn").addEventListener("click", () => {
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
-        const amount = Number(document.getElementById("smpAmount").value) || m.fee;
-        const paidOn = document.getElementById("smpPaidOn").value || todayISO();
-        const periodStart = document.getElementById("smpPeriodStart").value || m.nextDueDate;
-        const periodEnd = document.getElementById("smpPeriodEnd").value || addMonthsISO(periodStart, 1);
+        const amountRaw = document.getElementById("smpAmount").value;
+        const amount = Number(amountRaw);
+        const paidOn = document.getElementById("smpPaidOn").value;
+        const periodStart = document.getElementById("smpPeriodStart").value;
+        const periodEnd = document.getElementById("smpPeriodEnd").value;
+        const nextDueDate = document.getElementById("smpNextDueDate").value;
 
-        if (periodEnd <= periodStart) {
-          toast("Period end must be after period start", "error");
-          return;
+        // --- validation ---
+        if (!amountRaw || isNaN(amount) || amount <= 0) {
+          toast("Enter a valid payment amount", "error"); return;
         }
+        if (!isValidISODate(paidOn)) {
+          toast("Please select a valid payment date", "error"); return;
+        }
+        if (paidOn > todayISO()) {
+          toast("Payment date can't be in the future", "error"); return;
+        }
+        if (!isValidISODate(periodStart) || !isValidISODate(periodEnd) || !isValidISODate(nextDueDate)) {
+          toast("Please fill all date fields correctly", "error"); return;
+        }
+        if (periodEnd <= periodStart) {
+          toast("Period end must be after period start", "error"); return;
+        }
+        if (nextDueDate <= periodEnd) {
+          toast("Next due date must be after period end", "error"); return;
+        }
+        // --- end validation ---
 
         settings.lastReceiptNo = (settings.lastReceiptNo || 0) + 1;
         saveSettings(settings);
         const receiptNo = "RCPT-" + String(settings.lastReceiptNo).padStart(4, "0");
 
-        const payment = { id: uid(), amount, paidOn, periodStart, periodEnd, receiptNo };
+        const payment = { id: uid(), amount, paidOn, periodStart, periodEnd, nextDueDate, receiptNo };
         m.payments = m.payments || [];
         m.payments.push(payment);
-        m.nextDueDate = periodEnd;
+        m.nextDueDate = nextDueDate;
         saveMembers(members);
 
         closeSheets();
@@ -2776,12 +2838,24 @@
         const active = members.filter(m => m.status !== "inactive");
         if (filter === "overdue") return active.filter(m => memberStatus(m) === "overdue");
         if (filter === "due") return active.filter(m => memberStatus(m) === "due");
+        if (filter === "upcoming") {
+          // Due within REMINDER_ADVANCE_DAYS days, but not yet due today.
+          // E.g. fee date 1/08 with a 3-day window shows up from 29/07.
+          return active.filter(m => {
+            const diff = daysDiff(m.nextDueDate);
+            return diff > 0 && diff <= REMINDER_ADVANCE_DAYS;
+          });
+        }
         return active.filter(m => ["due", "overdue"].includes(memberStatus(m))); // all unpaid
       }
       function reminderRowHtml(m) {
         const st = memberStatus(m);
-        const pillClass = st === "overdue" ? "pill--overdue" : "pill--due";
-        const pillLabel = st === "overdue" ? "Overdue" : "Due Today";
+        const diff = daysDiff(m.nextDueDate);
+        let pillClass, pillLabel;
+        if (st === "overdue") { pillClass = "pill--overdue"; pillLabel = "Overdue"; }
+        else if (st === "due") { pillClass = "pill--due"; pillLabel = "Due Today"; }
+        else { pillClass = "pill--due"; pillLabel = `Due in ${diff}d`; } // upcoming / due soon
+        const sentToday = m.lastReminderSentOn === todayISO();
         return `<div class="row" data-member-id="${m.id}">
     <div class="row__avatar">${initials(m.name)}</div>
     <div class="row__main">
@@ -2789,13 +2863,16 @@
       <div class="row__meta">Due ${fmtDate(m.nextDueDate)} · ${fmtMoney(m.fee)}</div>
     </div>
     <div class="row__side"><span class="pill ${pillClass}">${pillLabel}</span></div>
-    ${rowActionBtnHtml(m)}
+    <button class="row-action-btn ${sentToday ? 'row-action-btn--sent' : 'row-action-btn--whatsapp'}" data-remind-id="${m.id}" aria-label="Send reminder">
+      ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
+    </button>
   </div>`;
       }
       function renderReminders() {
         const active = members.filter(m => m.status !== "inactive");
         document.getElementById("rcOverdue").textContent = active.filter(m => memberStatus(m) === "overdue").length;
         document.getElementById("rcDue").textContent = active.filter(m => memberStatus(m) === "due").length;
+        document.getElementById("rcUpcoming").textContent = reminderCandidates("upcoming").length;
         document.getElementById("rcAll").textContent = active.filter(m => ["due", "overdue"].includes(memberStatus(m))).length;
 
         document.querySelectorAll("[data-rfilter]").forEach(c => c.classList.toggle("active", c.dataset.rfilter === reminderFilter));
@@ -2828,7 +2905,7 @@
           sendAllBar = document.createElement("div");
           sendAllBar.className = "bottom-action-bar";
           sendAllBar.innerHTML = `<button class="btn btn--whatsapp" id="sendAllBtn">
-      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.1.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.5.1-.2 0-.4 0-.5C10 9 9.5 7.6 9.3 7c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+      ${WHATSAPP_SVG}
       Send All (<span id="sendAllCount">0</span>)
     </button>`;
           document.body.appendChild(sendAllBar);
@@ -2861,8 +2938,8 @@
         const btn = document.getElementById("brSendNext");
         btn.disabled = bulkIndex >= bulkQueue.length;
         btn.innerHTML = bulkIndex >= bulkQueue.length
-          ? `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg> All Sent`
-          : `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.1.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.5.1-.2 0-.4 0-.5C10 9 9.5 7.6 9.3 7c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg> Open Next Chat (${escapeHtml(bulkQueue[bulkIndex]?.name || "")})`;
+          ? `${CHECK_SVG} All Sent`
+          : `${WHATSAPP_SVG} Open Next Chat (${escapeHtml(bulkQueue[bulkIndex]?.name || "")})`;
 
         document.getElementById("brQueue").innerHTML = bulkQueue.map((m, i) => `
     <div class="row" style="${i < bulkIndex ? 'opacity:.5;' : ''}">
@@ -2888,16 +2965,20 @@
          RECEIPT
          =================================================================== */
       function openReceipt(m, payment) {
+        // Prefer the payment's OWN stored nextDueDate (set at the time the
+        // payment was made) so a receipt pulled up later for an older
+        // payment still reflects what was true then. Falls back to
+        // periodEnd + 1 day for payments recorded before this field existed
+        // (e.g. from an older backup).
+        const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
+
         document.getElementById("rcGymName").textContent = settings.gymName || "My Gym";
         document.getElementById("rcAmount").textContent = fmtMoney(payment.amount);
         document.getElementById("rcNumber").textContent = payment.receiptNo;
         document.getElementById("rcMember").textContent = m.name;
         document.getElementById("rcDate").textContent = fmtDate(payment.paidOn);
         document.getElementById("rcPeriod").textContent = fmtDate(payment.periodStart) + " – " + fmtDate(payment.periodEnd);
-        // Use this payment's own periodEnd, not the member's current due
-        // date — so a receipt pulled up later for an OLDER payment still
-        // shows the due date that resulted from that payment at the time.
-        document.getElementById("rcNextDue").textContent = fmtDate(payment.periodEnd);
+        document.getElementById("rcNextDue").textContent = fmtDate(nextDue);
         document.getElementById("rcFooter").textContent = "Thank you for your payment! · " + (settings.gymName || "");
         openPage("pageReceipt");
         currentReceiptCtx = { member: m, payment };
@@ -2908,7 +2989,8 @@
       document.getElementById("rcShareWhatsapp").addEventListener("click", () => {
         if (!currentReceiptCtx) return;
         const { member, payment } = currentReceiptCtx;
-        const text = `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(member.nextDueDate)}\nThank you!`;
+        const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
+        const text = `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
         window.open(waLink(member.whatsapp, text), "_blank");
       });
 
@@ -2930,7 +3012,8 @@
       document.getElementById("profileSaveBtn").addEventListener("click", () => {
         const name = document.getElementById("profileGymName").value.trim();
         const phone = cleanPhone(document.getElementById("profilePhone").value);
-        if (!name || phone.length !== 10) { toast("Enter a valid gym name and number", "error"); return; }
+        if (!name || name.length < 2) { toast("Enter a valid gym name", "error"); return; }
+        if (!isValidIndianMobile(phone)) { toast("Enter a valid 10-digit phone number", "error"); return; }
         settings.gymName = name; settings.ownerPhone = phone;
         saveSettings(settings); closeSheets(); renderSettings(); renderDashboard();
         toast("Profile updated");
@@ -2940,7 +3023,10 @@
         openSheet("sheetTemplate");
       });
       document.getElementById("templateSaveBtn").addEventListener("click", () => {
-        settings.template = document.getElementById("templateTextarea").value.trim() || settings.template;
+        const val = document.getElementById("templateTextarea").value.trim();
+        if (!val) { toast("Template can't be empty", "error"); return; }
+        if (!val.includes("{name}")) { toast("Template should include {name}", "error"); return; }
+        settings.template = val;
         saveSettings(settings); closeSheets(); toast("Message template saved");
       });
 
@@ -2964,11 +3050,16 @@
       });
       document.getElementById("billingSaveBtn").addEventListener("click", () => {
         const activeBtn = document.querySelector("#billingRuleSeg .segmented__opt.active");
-        settings.billingRule = activeBtn ? activeBtn.dataset.rule : "anniversary";
-        if (settings.billingRule === "fixedday") {
-          const day = Math.min(28, Math.max(1, Number(document.getElementById("billingFixedDay").value) || 1));
-          settings.billingFixedDay = day;
+        const rule = activeBtn ? activeBtn.dataset.rule : "anniversary";
+        if (rule === "fixedday") {
+          const raw = Number(document.getElementById("billingFixedDay").value);
+          if (!raw || raw < 1 || raw > 28) {
+            toast("Fixed day must be between 1 and 28", "error");
+            return;
+          }
+          settings.billingFixedDay = raw;
         }
+        settings.billingRule = rule;
         saveSettings(settings);
         closeSheets();
         renderSettings();
@@ -2999,14 +3090,64 @@
         reader.onload = () => {
           try {
             const data = JSON.parse(reader.result);
-            if (!Array.isArray(data.members)) throw new Error("bad file");
-            members = data.members;
-            if (data.settings) settings = Object.assign(settings, data.settings);
+            if (!data || !Array.isArray(data.members)) throw new Error("Missing members array");
+
+            // Validate & sanitize each member record instead of trusting
+            // the file blindly — a malformed backup could otherwise crash
+            // the app the first time a bad record is rendered.
+            const cleanMembers = data.members.map((m, i) => {
+              if (!m || typeof m.name !== "string" || !m.name.trim()) {
+                throw new Error(`Member #${i + 1} is missing a name`);
+              }
+              const whatsapp = cleanPhone(m.whatsapp);
+              if (!/^\d{10}$/.test(whatsapp)) {
+                throw new Error(`Member "${m.name}" has an invalid phone number`);
+              }
+              const fee = Number(m.fee);
+              if (!fee || fee <= 0) {
+                throw new Error(`Member "${m.name}" has an invalid fee`);
+              }
+              const joiningDate = isValidISODate(m.joiningDate) ? m.joiningDate : todayISO();
+              const nextDueDate = isValidISODate(m.nextDueDate) ? m.nextDueDate : joiningDate;
+              const payments = Array.isArray(m.payments) ? m.payments.filter(p =>
+                p && typeof p.amount === "number" && p.amount > 0 &&
+                isValidISODate(p.paidOn) && isValidISODate(p.periodStart) && isValidISODate(p.periodEnd)
+              ).map(p => ({
+                id: p.id || uid(),
+                amount: p.amount,
+                paidOn: p.paidOn,
+                periodStart: p.periodStart,
+                periodEnd: p.periodEnd,
+                nextDueDate: isValidISODate(p.nextDueDate) ? p.nextDueDate : addDaysISO(p.periodEnd, 1),
+                receiptNo: p.receiptNo || "RCPT-0000"
+              })) : [];
+              return {
+                id: m.id || uid(), name: m.name.trim(), whatsapp, fee, joiningDate, nextDueDate,
+                status: m.status === "inactive" ? "inactive" : "active",
+                payments,
+                lastReminderSentOn: isValidISODate(m.lastReminderSentOn) ? m.lastReminderSentOn : null
+              };
+            });
+
+            members = cleanMembers;
+            if (data.settings && typeof data.settings === "object") {
+              const s = data.settings;
+              settings = Object.assign(settings, {
+                gymName: typeof s.gymName === "string" && s.gymName.trim() ? s.gymName : settings.gymName,
+                ownerPhone: isValidIndianMobile(cleanPhone(s.ownerPhone)) ? cleanPhone(s.ownerPhone) : settings.ownerPhone,
+                template: typeof s.template === "string" && s.template.trim() ? s.template : settings.template,
+                lastReceiptNo: Number(s.lastReceiptNo) || settings.lastReceiptNo,
+                billingRule: ["anniversary", "fixedday"].includes(s.billingRule) ? s.billingRule : settings.billingRule,
+                billingFixedDay: Math.min(28, Math.max(1, Number(s.billingFixedDay) || settings.billingFixedDay))
+              });
+            }
             saveMembers(members); saveSettings(settings);
             closeSheets();
             toast("Backup imported");
             renderDashboard(); renderMembers(); renderSettings(); applyTheme();
-          } catch (err) { toast("Invalid backup file", "error"); }
+          } catch (err) {
+            toast("Invalid backup file: " + err.message, "error");
+          }
           importInput.value = "";
         };
         reader.readAsText(file);
@@ -3036,7 +3177,8 @@
         e.preventDefault();
         const name = document.getElementById("onbGymName").value.trim();
         const phone = cleanPhone(document.getElementById("onbPhone").value);
-        if (!name || phone.length !== 10) { toast("Enter a valid gym name and number", "error"); return; }
+        if (!name || name.length < 2) { toast("Enter a valid gym name", "error"); return; }
+        if (!isValidIndianMobile(phone)) { toast("Enter a valid 10-digit WhatsApp number", "error"); return; }
         settings.gymName = name; settings.ownerPhone = phone;
         saveSettings(settings);
         document.getElementById("onboard").classList.remove("active");
