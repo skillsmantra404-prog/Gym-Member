@@ -1551,7 +1551,7 @@
       <section class="view active" id="viewDashboard">
         <div class="greeting" style="font-size:21px;font-weight:800;" id="dashGreeting">Hello 👋</div>
         <div class="text-2" style="font-size:13px;color:var(--text-2);margin-bottom:16px;" id="dashDate">Today</div>
-
+        <div id="dashBackupReminder"></div>
         <div class="stat-grid">
           <button class="stat-card stat--primary" data-goto-members="all">
             <span class="stat-card__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -1994,6 +1994,8 @@
               id="rcNumber">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Member</span><span class="receipt-row__value"
               id="rcMember">—</span></div>
+          <div class="receipt-row"><span class="receipt-row__label">Joining Date</span><span class="receipt-row__value"
+              id="rcJoiningDate">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Paid On</span><span class="receipt-row__value"
               id="rcDate">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Period Covered</span><span
@@ -2005,22 +2007,7 @@
         </div>
       </div>
       <div class="section" style="display:flex;flex-direction:column;gap:10px;">
-        <button class="btn btn--primary" id="rcDownloadPdf">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-            stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
-          </svg>
-          Download PDF
-        </button>
-        <div class="btn-row">
-          <button class="btn btn--secondary" id="rcPrint">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round">
-              <path
-                d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z" />
-            </svg>
-            Print
-          </button>
+        <div class="section" style="display:flex;flex-direction:column;gap:10px;">
           <button class="btn btn--whatsapp" id="rcShareWhatsapp">
             <svg viewBox="0 0 24 24" fill="currentColor">
               <path
@@ -2028,11 +2015,39 @@
               <path
                 d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" />
             </svg>
-            Share
+            Share on WhatsApp
           </button>
+          <button class="btn btn--primary" id="rcShareAny" style="display:none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round">
+              <circle cx="18" cy="5" r="3" />
+              <circle cx="6" cy="12" r="3" />
+              <circle cx="18" cy="19" r="3" />
+              <path d="m8.6 10.5 6.8-3.9M8.6 13.5l6.8 3.9" />
+            </svg>
+            Share Receipt
+          </button>
+          <div class="btn-row">
+            <button class="btn btn--secondary" id="rcPrint">"btn-row">
+              <button class="btn btn--secondary" id="rcPrint">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path
+                    d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z" />
+                </svg>
+                Print
+              </button>
+              <button class="btn btn--secondary" id="rcDownloadPdf">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                  stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+                </svg>
+                Save as PDF
+              </button>
+          </div>
+          <div class="field__hint" style="text-align:center;">Sharing sends the receipt straight to the member — no need
+            to download or print unless you want a copy for your own records.</div>
         </div>
-        <div class="field__hint" style="text-align:center;">"Download PDF" opens your browser's print dialog — choose
-          "Save as PDF" as the destination.</div>
       </div>
     </div>
   </div>
@@ -2146,7 +2161,8 @@
     <div class="sheet" id="sheetBackup" data-sheet>
       <div class="sheet__handle"></div>
       <div class="sheet__title">Backup your data</div>
-      <div class="sheet__desc">Save a copy of all members and payment history, or restore from a previous backup.</div>
+      <div class="sheet__desc">Save a copy of all members and payment history, or restore from a previous backup.
+      </div>
       <button class="sheet-action" id="backupExportBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
           stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
@@ -2228,13 +2244,65 @@
       // Reminders tab's "Due Soon" chip. E.g. fee date 1/08 -> shows up
       // from 29/07 onward.
       const REMINDER_ADVANCE_DAYS = 3;
-
-      function loadMembers() { try { return JSON.parse(localStorage.getItem(LS_MEMBERS)) || []; } catch (e) { return []; } }
-      function saveMembers(list) { localStorage.setItem(LS_MEMBERS, JSON.stringify(list)); }
-      function loadSettings() {
-        try { return JSON.parse(localStorage.getItem(LS_SETTINGS)) || null; } catch (e) { return null; }
+      let storageCorruptionDetected = false;
+      function init() {
+        const hasSettings = !!loadSettings();
+        if (!hasSettings) {
+          document.getElementById("onboard").classList.add("active");
+        } else {
+          document.getElementById("app").style.display = "flex";
+          showView("dashboard");
+        }
+        applyTheme();
+        if (storageCorruptionDetected) {
+          toast("Some saved data looked corrupted and was reset — a copy of the raw data was kept on this device.", "error");
+        }
       }
-      function saveSettings(s) { localStorage.setItem(LS_SETTINGS, JSON.stringify(s)); }
+
+      function loadMembers() {
+        const raw = localStorage.getItem(LS_MEMBERS);
+        if (!raw) return [];
+        try {
+          const parsed = JSON.parse(raw);
+          return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+          // Never silently discard unreadable data — stash the raw string
+          // under a recovery key so nothing is truly lost, and flag it.
+          localStorage.setItem(LS_MEMBERS + "_corrupted_" + Date.now(), raw);
+          storageCorruptionDetected = true;
+          return [];
+        }
+      }
+      function saveMembers(list) {
+        try {
+          localStorage.setItem(LS_MEMBERS, JSON.stringify(list));
+          return true;
+        } catch (e) {
+          toast("Couldn't save changes — device storage may be full. Export a backup now.", "error");
+          return false;
+        }
+      }
+      function loadSettings() {
+        const raw = localStorage.getItem(LS_SETTINGS);
+        if (!raw) return null;
+        try {
+          const parsed = JSON.parse(raw);
+          return (parsed && typeof parsed === "object") ? parsed : null;
+        } catch (e) {
+          localStorage.setItem(LS_SETTINGS + "_corrupted_" + Date.now(), raw);
+          storageCorruptionDetected = true;
+          return null;
+        }
+      }
+      function saveSettings(s) {
+        try {
+          localStorage.setItem(LS_SETTINGS, JSON.stringify(s));
+          return true;
+        } catch (e) {
+          toast("Couldn't save settings — device storage may be full.", "error");
+          return false;
+        }
+      }
 
       let members = loadMembers();
       let settings = loadSettings() || {
@@ -2431,6 +2499,24 @@
       /* ===================================================================
          DASHBOARD
          =================================================================== */
+      const reminderWrap = document.getElementById("dashBackupReminder");
+      const lastBackup = settings.lastBackupAt ? new Date(settings.lastBackupAt) : null;
+      const daysSince = lastBackup ? Math.floor((Date.now() - lastBackup.getTime()) / 86400000) : Infinity;
+      if (members.length > 0 && daysSince >= 7) {
+        reminderWrap.innerHTML = `<div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+            <div class="list-item__icon" style="background:var(--due-bg);color:var(--due);flex-shrink:0;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:13.5px;font-weight:700;">${lastBackup ? "Backup is " + daysSince + " days old" : "You haven't backed up yet"}</div>
+              <div style="font-size:12px;color:var(--text-2);">Your data only lives in this browser. Back it up so it's not lost if browsing data is cleared.</div>
+            </div>
+            <button class="btn btn--secondary" style="width:auto;height:38px;padding:0 14px;flex-shrink:0;" id="dashBackupNowBtn">Backup</button>
+          </div>`;
+        document.getElementById("dashBackupNowBtn").addEventListener("click", exportBackup);
+      } else {
+        reminderWrap.innerHTML = "";
+      }
       function renderDashboard() {
         document.getElementById("dashGreeting").textContent = "Hello, " + (settings.gymName || "there") + " 👋";
         document.getElementById("dashDate").textContent = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
@@ -2608,6 +2694,10 @@
         document.getElementById("mfFee").value = m.fee;
         document.getElementById("mfJoiningDate").value = m.joiningDate;
         document.getElementById("memberFormTitle").textContent = "Edit Member";
+        // Member Detail sits later in the page markup, so with both pages
+        // "active" it visually paints on top of the edit form — the form
+        // WAS opening, just hidden underneath. Close Detail explicitly first.
+        closePage("pageMemberDetail");
         openPage("pageMemberForm");
       }
       memberForm.addEventListener("submit", (e) => {
@@ -2656,6 +2746,9 @@
         saveMembers(members);
         closePage("pageMemberForm");
         renderDashboard(); renderMembers();
+        // Return to the (now up-to-date) detail page for the member we
+        // just edited, instead of leaving them stranded on an empty screen.
+        if (id) openMemberDetail(id);
       });
 
       /* ===================================================================
@@ -2965,6 +3058,13 @@
          RECEIPT
          =================================================================== */
       function openReceipt(m, payment) {
+        // Always re-fetch the live member record by id. Every current
+        // call site already passes a freshly-looked-up member, but doing
+        // this here too means the receipt can NEVER show a stale
+        // Joining Date, even if a future code change passes in an old
+        // cached member object.
+        const liveMember = members.find(x => x.id === m.id) || m;
+
         // Prefer the payment's OWN stored nextDueDate (set at the time the
         // payment was made) so a receipt pulled up later for an older
         // payment still reflects what was true then. Falls back to
@@ -2975,13 +3075,14 @@
         document.getElementById("rcGymName").textContent = settings.gymName || "My Gym";
         document.getElementById("rcAmount").textContent = fmtMoney(payment.amount);
         document.getElementById("rcNumber").textContent = payment.receiptNo;
-        document.getElementById("rcMember").textContent = m.name;
+        document.getElementById("rcMember").textContent = liveMember.name;
+        document.getElementById("rcJoiningDate").textContent = fmtDate(liveMember.joiningDate);
         document.getElementById("rcDate").textContent = fmtDate(payment.paidOn);
         document.getElementById("rcPeriod").textContent = fmtDate(payment.periodStart) + " – " + fmtDate(payment.periodEnd);
         document.getElementById("rcNextDue").textContent = fmtDate(nextDue);
         document.getElementById("rcFooter").textContent = "Thank you for your payment! · " + (settings.gymName || "");
         openPage("pageReceipt");
-        currentReceiptCtx = { member: m, payment };
+        currentReceiptCtx = { member: liveMember, payment };
       }
       let currentReceiptCtx = null;
       document.getElementById("rcPrint").addEventListener("click", () => window.print());
@@ -2990,9 +3091,22 @@
         if (!currentReceiptCtx) return;
         const { member, payment } = currentReceiptCtx;
         const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
-        const text = `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
+        const text = `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nJoining Date: ${fmtDate(member.joiningDate)}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
         window.open(waLink(member.whatsapp, text), "_blank");
       });
+      // Native device share sheet (SMS, email, other apps) — no download
+      // needed. Shown only where the browser supports it.
+      const rcShareAnyBtn = document.getElementById("rcShareAny");
+      if (navigator.share) {
+        rcShareAnyBtn.style.display = "flex";
+        rcShareAnyBtn.addEventListener("click", async () => {
+          if (!currentReceiptCtx) return;
+          const { member, payment } = currentReceiptCtx;
+          const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
+          const text = `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nJoining Date: ${fmtDate(member.joiningDate)}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
+          try { await navigator.share({ title: "Payment Receipt", text }); } catch (e) { /* user cancelled — ignore */ }
+        });
+      }
 
       /* ===================================================================
          SETTINGS
@@ -3078,8 +3192,11 @@
         a.href = url; a.download = `gym-manager-backup-${todayISO()}.json`;
         document.body.appendChild(a); a.click(); a.remove();
         URL.revokeObjectURL(url);
+        settings.lastBackupAt = new Date().toISOString();
+        saveSettings(settings);
         closeSheets();
         toast("Backup exported");
+        if (document.getElementById("viewDashboard").classList.contains("active")) renderDashboard();
       }
       const importInput = document.getElementById("importFileInput");
       document.getElementById("settingsImport").addEventListener("click", () => importInput.click());
