@@ -1059,6 +1059,46 @@
       font-size: 14px;
     }
 
+    .timeline-item__actions {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      margin-left: 8px;
+      flex-shrink: 0;
+    }
+
+    .timeline-item__iconbtn {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: var(--surface-alt);
+      color: var(--text-2);
+    }
+
+    .timeline-item__iconbtn svg {
+      width: 14px;
+      height: 14px;
+    }
+
+    .timeline-item__iconbtn--danger {
+      background: var(--overdue-bg);
+      color: var(--overdue);
+    }
+
+    .latest-payment-badge {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      background: var(--primary-light);
+      border-radius: var(--radius-pill);
+      padding: 2px 8px;
+      margin-left: 6px;
+    }
+
     /* Receipt (also used for print) */
     .receipt {
       background: var(--surface);
@@ -1799,7 +1839,7 @@
                 data</span><span class="list-item__desc">Permanently delete everything</span></span>
           </button>
         </div>
-        <div class="app-version">Gym Manager · Works fully offline · v1.0.2</div>
+        <div class="app-version">Gym Manager · Works fully offline · v1.0.3</div>
       </section>
     </main>
 
@@ -2028,22 +2068,21 @@
             Share Receipt
           </button>
           <div class="btn-row">
-            <button class="btn btn--secondary" id="rcPrint">"btn-row">
-              <button class="btn btn--secondary" id="rcPrint">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <path
-                    d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z" />
-                </svg>
-                Print
-              </button>
-              <button class="btn btn--secondary" id="rcDownloadPdf">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                  stroke-linejoin="round">
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
-                </svg>
-                Save as PDF
-              </button>
+            <button class="btn btn--secondary" id="rcPrint">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path
+                  d="M6 9V2h12v7M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2M6 14h12v8H6z" />
+              </svg>
+              Print
+            </button>
+            <button class="btn btn--secondary" id="rcDownloadPdf">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+              </svg>
+              Save as PDF
+            </button>
           </div>
           <div class="field__hint" style="text-align:center;">Sharing sends the receipt straight to the member — no need
             to download or print unless you want a copy for your own records.</div>
@@ -2117,7 +2156,7 @@
 
     <div class="sheet" id="sheetMarkPaid" data-sheet>
       <div class="sheet__handle"></div>
-      <div class="sheet__title">Confirm payment</div>
+      <div class="sheet__title" id="smpTitle">Confirm payment</div>
       <div class="sheet__desc" id="smpDesc">Mark this month's fee as paid?</div>
       <div class="field">
         <label class="field__label">Amount received</label>
@@ -2127,6 +2166,8 @@
       <div class="field">
         <label class="field__label">Paid on</label>
         <input class="field__input" id="smpPaidOn" type="date">
+        <div class="field__hint" id="smpPaidOnHint">All dates are pre-filled automatically based on the billing rule
+          and the current due date. Edit any of them if they aren't right for this payment.</div>
       </div>
       <div class="field">
         <label class="field__label">Period covered — start</label>
@@ -2139,8 +2180,6 @@
       <div class="field">
         <label class="field__label">Next due date</label>
         <input class="field__input" id="smpNextDueDate" type="date">
-        <div class="field__hint">All dates are pre-filled automatically based on the billing rule and the current
-          due date. Edit any of them if they aren't right for this payment.</div>
       </div>
       <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
           class="btn btn--primary" id="smpConfirmBtn">Confirm</button></div>
@@ -2227,6 +2266,15 @@
       <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
           class="btn btn--danger" id="confirmClearDataBtn">Clear Everything</button></div>
     </div>
+
+    <div class="sheet" id="sheetConfirmDeletePayment" data-sheet>
+      <div class="sheet__handle"></div>
+      <div class="sheet__title">Remove this payment?</div>
+      <div class="sheet__desc">This deletes the payment record and reverts the member's next due date to what it was
+        before this payment. This can't be undone.</div>
+      <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
+          class="btn btn--danger" id="confirmDeletePaymentBtn">Remove</button></div>
+    </div>
   </div>
 
   <script>
@@ -2240,24 +2288,8 @@
       const LS_MEMBERS = "gym_members_v1";
       const LS_SETTINGS = "gym_settings_v1";
 
-      // How many days before the due date a member shows up under the
-      // Reminders tab's "Due Soon" chip. E.g. fee date 1/08 -> shows up
-      // from 29/07 onward.
       const REMINDER_ADVANCE_DAYS = 3;
       let storageCorruptionDetected = false;
-      function init() {
-        const hasSettings = !!loadSettings();
-        if (!hasSettings) {
-          document.getElementById("onboard").classList.add("active");
-        } else {
-          document.getElementById("app").style.display = "flex";
-          showView("dashboard");
-        }
-        applyTheme();
-        if (storageCorruptionDetected) {
-          toast("Some saved data looked corrupted and was reset — a copy of the raw data was kept on this device.", "error");
-        }
-      }
 
       function loadMembers() {
         const raw = localStorage.getItem(LS_MEMBERS);
@@ -2266,14 +2298,45 @@
           const parsed = JSON.parse(raw);
           return Array.isArray(parsed) ? parsed : [];
         } catch (e) {
-          // Never silently discard unreadable data — stash the raw string
-          // under a recovery key so nothing is truly lost, and flag it.
           localStorage.setItem(LS_MEMBERS + "_corrupted_" + Date.now(), raw);
           storageCorruptionDetected = true;
           return [];
         }
       }
+      /* ------------------------- BILLING DEBUG ------------------------- */
+      // Temporary diagnostics for: Mark Paid -> Cancel -> Mark Paid again.
+      // These logs DO NOT change billing data. Remove this block after debugging.
+      function billingDebugState(label) {
+        const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+        const nextDueDate = m?.nextDueDate ?? null;
+        const joiningDate = m?.joiningDate ?? null;
+        const payments = m?.payments || [];
+        console.log(`[BILLING DEBUG] ${label}`, {
+          time: new Date().toISOString(),
+          activeMemberId,
+          memberName: m?.name ?? null,
+          joiningDate,
+          nextDueDate,
+          paymentsCount: payments.length,
+          payments: JSON.parse(JSON.stringify(payments)),
+          markPaidDraft: markPaidDraft ? { ...markPaidDraft } : null,
+          domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null,
+          domPeriodStart: document.getElementById("smpPeriodStart")?.value ?? null,
+          domPeriodEnd: document.getElementById("smpPeriodEnd")?.value ?? null
+        });
+        return { nextDueDate, joiningDate, paymentsCount: payments.length };
+      }
+
       function saveMembers(list) {
+        const snapshot = list.map(x => ({
+          id: x.id,
+          name: x.name,
+          joiningDate: x.joiningDate,
+          nextDueDate: x.nextDueDate,
+          paymentsCount: (x.payments || []).length
+        }));
+        console.log("[BILLING DEBUG] saveMembers()", snapshot);
+        console.trace("[BILLING DEBUG] saveMembers() CALL STACK");
         try {
           localStorage.setItem(LS_MEMBERS, JSON.stringify(list));
           return true;
@@ -2314,19 +2377,12 @@
         billingRule: "anniversary", // "anniversary" | "fixedday"
         billingFixedDay: 1
       };
-      // Backfill for users upgrading from an older version without these keys
       if (!settings.billingRule) settings.billingRule = "anniversary";
       if (!settings.billingFixedDay) settings.billingFixedDay = 1;
 
       /* ------------------------- UTILS ------------------------- */
       function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
-      // IMPORTANT: use LOCAL date parts, never toISOString(), to build/format
-      // "YYYY-MM-DD" strings. toISOString() always converts to UTC, and for
-      // any timezone ahead of UTC (e.g. India, UTC+5:30) a local midnight
-      // timestamp rolls back to the previous UTC day — silently knocking a
-      // day off every date the app stores. That was the root cause of dates
-      // like "2 Oct" appearing instead of the correct "3 Oct".
       function toLocalISO(d) {
         const y = d.getFullYear();
         const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -2355,7 +2411,7 @@
         d.setDate(d.getDate() + days);
         return toLocalISO(d);
       }
-      function daysDiff(iso) { // due date minus today, in days
+      function daysDiff(iso) {
         const a = new Date(todayISO() + "T00:00:00");
         const b = new Date(iso + "T00:00:00");
         return Math.round((b - a) / 86400000);
@@ -2368,48 +2424,23 @@
       function cleanPhone(v) { return (v || "").replace(/\D/g, "").slice(-10); }
       function isValidIndianMobile(v) { return /^[6-9]\d{9}$/.test(v || ""); }
 
-      // Last calendar day of the month that contains the given ISO date.
       function endOfMonthISO(iso) {
         const d = new Date(iso + "T00:00:00");
         return toLocalISO(new Date(d.getFullYear(), d.getMonth() + 1, 0));
       }
 
-      // Given the CURRENT next-due-date of a member, work out the period
-      // this payment covers and the resulting new next-due-date.
-      //
-      // This is ALWAYS based on the existing due date, one month forward —
-      // never on the date the payment actually happens to be made. Whether
-      // the member pays exactly on time or several days/weeks late, the
-      // period and next due date come out the same, because the billing
-      // cycle itself hasn't shifted — only how late they were in paying it.
-      //
-      // periodEnd is the LAST DAY ACTUALLY COVERED (inclusive) — e.g. due
-      // 5/08, pay any time -> period 5/08 to 4/09, next due 5/09. If they
-      // were overdue (due was 1/08, paid 5/08) -> period 1/08 to 31/08,
-      // next due 1/09. periodEnd is never the same calendar day as the
-      // next due date; nextDueDate is always periodEnd + 1 day.
-      //
-      // Follows whichever billing rule is set in Settings -> Billing:
-      //   "anniversary" (default): period runs from the existing due date
-      //     for one calendar month.
-      //   "fixedday": every period starts on a fixed day-of-month you
-      //     configure, useful for gyms that bill everyone on the same date
-      //     regardless of when they joined or paid.
-      function computeBillingPeriod(currentDueDateISO, paidOnISO) {
+      function computeBillingPeriod(baseDueDateISO) {
         let periodStart, cycleStart;
         if (settings.billingRule === "fixedday") {
           const day = Math.min(28, Math.max(1, Number(settings.billingFixedDay) || 1));
-          const base = new Date(currentDueDateISO + "T00:00:00");
+          const base = new Date(baseDueDateISO + "T00:00:00");
           base.setDate(day);
           periodStart = toLocalISO(base);
           cycleStart = addMonthsISO(periodStart, 1);
         } else {
-          // anniversary (default)
-          periodStart = currentDueDateISO;
-          cycleStart = addMonthsISO(currentDueDateISO, 1);
+          periodStart = baseDueDateISO;
+          cycleStart = addMonthsISO(baseDueDateISO, 1);
         }
-        // periodEnd = last day actually covered (inclusive), one day before
-        // the next cycle starts. nextDueDate = the day the next cycle starts.
         const periodEnd = addDaysISO(cycleStart, -1);
         return { periodStart, periodEnd, nextDueDate: cycleStart };
       }
@@ -2419,7 +2450,7 @@
         const diff = daysDiff(m.nextDueDate);
         if (diff < 0) return "overdue";
         if (diff === 0) return "due";
-        return "paid"; // paid up / upcoming
+        return "paid";
       }
 
       /* ------------------------- TOAST ------------------------- */
@@ -2488,13 +2519,147 @@
       /* ------------------------- SHEETS ------------------------- */
       const overlay = document.getElementById("overlay");
       function openSheet(id) {
+        if (id === "sheetMarkPaid") {
+          const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+          console.log("🟢 [BILLING DEBUG] openSheet(sheetMarkPaid)", {
+            memberNextDueDate: m?.nextDueDate ?? null,
+            markPaidDraft: markPaidDraft ? { ...markPaidDraft } : null,
+            domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
+          });
+          console.trace("TRACE: openSheet(sheetMarkPaid)");
+        }
         document.querySelectorAll(".sheet").forEach(s => s.classList.remove("active"));
         document.getElementById(id).classList.add("active");
         overlay.classList.add("active");
       }
-      function closeSheets() { overlay.classList.remove("active"); document.querySelectorAll(".sheet").forEach(s => s.classList.remove("active")); }
-      overlay.addEventListener("click", (e) => { if (e.target === overlay) closeSheets(); });
-      document.querySelectorAll("[data-close-sheet]").forEach(b => b.addEventListener("click", closeSheets));
+      function closeSheets(reason = "UNKNOWN") {
+        console.group(`🟠 [BILLING DEBUG] closeSheets(${reason})`);
+
+        const mBefore = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+        const beforeNextDueDate = mBefore?.nextDueDate ?? null;
+        const beforeJoiningDate = mBefore?.joiningDate ?? null;
+        const beforePaymentsCount = (mBefore?.payments || []).length;
+
+        console.log("BEFORE closeSheets", {
+          reason,
+          activeMemberId,
+          memberName: mBefore?.name ?? null,
+          joiningDate: beforeJoiningDate,
+          nextDueDate: beforeNextDueDate,
+          paymentsCount: beforePaymentsCount,
+          markPaidDraft: markPaidDraft ? { ...markPaidDraft } : null,
+          domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null,
+          domPeriodStart: document.getElementById("smpPeriodStart")?.value ?? null,
+          domPeriodEnd: document.getElementById("smpPeriodEnd")?.value ?? null
+        });
+        console.trace("TRACE: closeSheets() called from");
+
+        overlay.classList.remove("active");
+        document.querySelectorAll(".sheet").forEach(s => s.classList.remove("active"));
+
+        editingPaymentId = null;
+        pendingDeletePaymentId = null;
+        markPaidDraft = null;
+
+        const mAfter = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+        const afterNextDueDate = mAfter?.nextDueDate ?? null;
+        const afterJoiningDate = mAfter?.joiningDate ?? null;
+        const afterPaymentsCount = (mAfter?.payments || []).length;
+
+        console.log("AFTER closeSheets", {
+          reason,
+          joiningDate: afterJoiningDate,
+          nextDueDate: afterNextDueDate,
+          paymentsCount: afterPaymentsCount,
+          markPaidDraft,
+          domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
+        });
+
+        if (beforeNextDueDate !== afterNextDueDate) {
+          console.error("🔥🔥 DATE CHANGED INSIDE closeSheets()!", {
+            reason,
+            beforeNextDueDate,
+            afterNextDueDate
+          });
+          console.trace("🔥 TRACE: nextDueDate changed during closeSheets()");
+        } else {
+          console.log("✅ nextDueDate DID NOT change inside closeSheets()");
+        }
+
+        console.groupEnd();
+
+        // Check again on the next event-loop turn. This catches another
+        // handler/function that mutates the member immediately after close.
+        setTimeout(() => {
+          const mLater = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+          const laterNextDueDate = mLater?.nextDueDate ?? null;
+          console.log(`[BILLING DEBUG] 0ms AFTER closeSheets(${reason})`, {
+            nextDueDate: laterNextDueDate,
+            expectedUnchanged: beforeNextDueDate,
+            changedAfterClose: laterNextDueDate !== beforeNextDueDate,
+            markPaidDraft,
+            domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
+          });
+          if (laterNextDueDate !== beforeNextDueDate) {
+            console.error("🔥🔥 DATE CHANGED AFTER closeSheets() RETURNED!", {
+              reason,
+              beforeNextDueDate,
+              laterNextDueDate
+            });
+            console.trace("🔥 TRACE: date changed after closeSheets()");
+          }
+        }, 0);
+      }
+
+      overlay.addEventListener("click", (e) => {
+        if (e.target !== overlay) return;
+        console.log("🟣 [BILLING DEBUG] OVERLAY CLICK");
+        console.trace("TRACE: overlay click");
+        billingDebugState("BEFORE OVERLAY CLOSE");
+        closeSheets("OVERLAY CLICK");
+      });
+
+      document.querySelectorAll("[data-close-sheet]").forEach(b => {
+        b.addEventListener("click", function (e) {
+          const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+          const beforeNextDueDate = m?.nextDueDate ?? null;
+
+          console.group("🔴 [BILLING DEBUG] CANCEL / CLOSE BUTTON CLICK");
+          console.log("Clicked element:", this);
+          console.log("Button text:", this.textContent.trim());
+          console.log("Sheet containing button:", this.closest(".sheet")?.id);
+          console.log("BEFORE CANCEL BUTTON HANDLER", {
+            nextDueDate: beforeNextDueDate,
+            joiningDate: m?.joiningDate ?? null,
+            paymentsCount: (m?.payments || []).length,
+            markPaidDraft: markPaidDraft ? { ...markPaidDraft } : null,
+            domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
+          });
+          console.trace("TRACE: CANCEL BUTTON CLICK");
+
+          closeSheets("CANCEL / CLOSE BUTTON");
+
+          const mAfter = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+          console.log("AFTER CANCEL BUTTON HANDLER", {
+            nextDueDate: mAfter?.nextDueDate ?? null,
+            joiningDate: mAfter?.joiningDate ?? null,
+            paymentsCount: (mAfter?.payments || []).length,
+            markPaidDraft,
+            domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
+          });
+
+          if (beforeNextDueDate !== (mAfter?.nextDueDate ?? null)) {
+            console.error("🔥🔥 CANCEL BUTTON CHANGED THE DATE!", {
+              beforeNextDueDate,
+              afterNextDueDate: mAfter?.nextDueDate ?? null
+            });
+            console.trace("🔥 TRACE: CANCEL BUTTON DATE CHANGE");
+          } else {
+            console.log("✅ CANCEL BUTTON DID NOT CHANGE member.nextDueDate");
+          }
+          console.groupEnd();
+        });
+      });
 
       /* ===================================================================
          DASHBOARD
@@ -2504,15 +2669,15 @@
       const daysSince = lastBackup ? Math.floor((Date.now() - lastBackup.getTime()) / 86400000) : Infinity;
       if (members.length > 0 && daysSince >= 7) {
         reminderWrap.innerHTML = `<div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-            <div class="list-item__icon" style="background:var(--due-bg);color:var(--due);flex-shrink:0;">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-            </div>
-            <div style="flex:1;">
-              <div style="font-size:13.5px;font-weight:700;">${lastBackup ? "Backup is " + daysSince + " days old" : "You haven't backed up yet"}</div>
-              <div style="font-size:12px;color:var(--text-2);">Your data only lives in this browser. Back it up so it's not lost if browsing data is cleared.</div>
-            </div>
-            <button class="btn btn--secondary" style="width:auto;height:38px;padding:0 14px;flex-shrink:0;" id="dashBackupNowBtn">Backup</button>
-          </div>`;
+                <div class="list-item__icon" style="background:var(--due-bg);color:var(--due);flex-shrink:0;">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                </div>
+                <div style="flex:1;">
+                  <div style="font-size:13.5px;font-weight:700;">${lastBackup ? "Backup is " + daysSince + " days old" : "You haven't backed up yet"}</div>
+                  <div style="font-size:12px;color:var(--text-2);">Your data only lives in this browser. Back it up so it's not lost if browsing data is cleared.</div>
+                </div>
+                <button class="btn btn--secondary" style="width:auto;height:38px;padding:0 14px;flex-shrink:0;" id="dashBackupNowBtn">Backup</button>
+              </div>`;
         document.getElementById("dashBackupNowBtn").addEventListener("click", exportBackup);
       } else {
         reminderWrap.innerHTML = "";
@@ -2543,10 +2708,10 @@
         const wrap = document.getElementById("dashAttention");
         if (attention.length === 0) {
           wrap.innerHTML = `<div class="empty" style="padding:30px 20px;">
-      <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
-      <div class="empty__title">Nothing due right now</div>
-      <div class="empty__desc">Members needing a reminder or payment will show up here.</div>
-    </div>`;
+          <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="empty__title">Nothing due right now</div>
+          <div class="empty__desc">Members needing a reminder or payment will show up here.</div>
+        </div>`;
         } else {
           wrap.innerHTML = attention.map(memberRowHtml).join("");
           bindMemberRowClicks(wrap);
@@ -2563,22 +2728,33 @@
         const list = (m.payments || []).slice().sort((a, b) => b.paidOn.localeCompare(a.paidOn));
         return list[0] || null;
       }
+      function mostRecentlyRecordedPayment(m) {
+        const list = m.payments || [];
+        return list.length ? list[list.length - 1] : null;
+      }
+      function dueDateBeforeMostRecentPayment(m) {
+        const list = m.payments || [];
+        if (list.length <= 1) return m.joiningDate;
+        return list[list.length - 2].nextDueDate || m.joiningDate;
+      }
       const WHATSAPP_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.1.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.5.1-.2 0-.4 0-.5C10 9 9.5 7.6 9.3 7c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>';
       const CHECK_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg>';
+      const EDIT_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>';
+      const TRASH_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0-1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L4 6"/></svg>';
       function rowActionBtnHtml(m) {
         const st = memberStatus(m);
         if (st === "due" || st === "overdue") {
           const sentToday = m.lastReminderSentOn === todayISO();
           return `<button class="row-action-btn ${sentToday ? 'row-action-btn--sent' : 'row-action-btn--whatsapp'}" data-remind-id="${m.id}" aria-label="Send reminder">
-      ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
-    </button>`;
+          ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
+        </button>`;
         }
         if (st === "paid") {
           const lp = latestPaymentOf(m);
           if (!lp) return "";
           return `<button class="row-action-btn row-action-btn--receipt" data-receipt-id="${m.id}" aria-label="View receipt">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2V8Z"/><path d="M9 12h6M9 16h6M9 8h2"/></svg>
-    </button>`;
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2V8Z"/><path d="M9 12h6M9 16h6M9 8h2"/></svg>
+        </button>`;
         }
         return "";
       }
@@ -2587,17 +2763,17 @@
         const pillClass = { due: "pill--due", overdue: "pill--overdue", paid: "pill--paid", inactive: "pill--inactive" }[st];
         const pillLabel = { due: "Due Today", overdue: "Overdue", paid: "Paid Up", inactive: "Inactive" }[st];
         return `<div class="row" data-member-id="${m.id}">
-    <div class="row__avatar">${initials(m.name)}</div>
-    <div class="row__main">
-      <div class="row__name">${escapeHtml(m.name)}</div>
-      <div class="row__meta">${st === "inactive" ? "Inactive" : "Due " + fmtDate(m.nextDueDate)}</div>
-    </div>
-    <div class="row__side">
-      <span class="pill ${pillClass}">${pillLabel}</span>
-      <span class="row__fee">${fmtMoney(m.fee)}</span>
-    </div>
-    ${rowActionBtnHtml(m)}
-  </div>`;
+        <div class="row__avatar">${initials(m.name)}</div>
+        <div class="row__main">
+          <div class="row__name">${escapeHtml(m.name)}</div>
+          <div class="row__meta">${st === "inactive" ? "Inactive" : "Due " + fmtDate(m.nextDueDate)}</div>
+        </div>
+        <div class="row__side">
+          <span class="pill ${pillClass}">${pillLabel}</span>
+          <span class="row__fee">${fmtMoney(m.fee)}</span>
+        </div>
+        ${rowActionBtnHtml(m)}
+      </div>`;
       }
       function bindMemberRowClicks(container) {
         container.querySelectorAll("[data-member-id]").forEach(row => {
@@ -2656,8 +2832,6 @@
         if (list.length === 0) { wrap.innerHTML = ""; empty.style.display = "block"; }
         else { empty.style.display = "none"; wrap.innerHTML = list.map(memberRowHtml).join(""); bindMemberRowClicks(wrap); }
 
-        // Bottom "Send All" bar reflects whichever members with a due/overdue
-        // reminder are currently visible in this filtered/searched list.
         const remindable = list.filter(m => ["due", "overdue"].includes(memberStatus(m)));
         updateSendAllBar(remindable.length, remindable, "members");
       }
@@ -2694,9 +2868,6 @@
         document.getElementById("mfFee").value = m.fee;
         document.getElementById("mfJoiningDate").value = m.joiningDate;
         document.getElementById("memberFormTitle").textContent = "Edit Member";
-        // Member Detail sits later in the page markup, so with both pages
-        // "active" it visually paints on top of the edit form — the form
-        // WAS opening, just hidden underneath. Close Detail explicitly first.
         closePage("pageMemberDetail");
         openPage("pageMemberForm");
       }
@@ -2708,7 +2879,6 @@
         const fee = Number(document.getElementById("mfFee").value);
         const joiningDate = document.getElementById("mfJoiningDate").value;
 
-        // --- validation ---
         if (!name || name.length < 2) {
           toast("Please enter a valid name", "error"); return;
         }
@@ -2728,7 +2898,6 @@
         if (dup) {
           toast(`This number is already used by ${dup.name}`, "error"); return;
         }
-        // --- end validation ---
 
         if (id) {
           const m = members.find(x => x.id === id);
@@ -2746,8 +2915,6 @@
         saveMembers(members);
         closePage("pageMemberForm");
         renderDashboard(); renderMembers();
-        // Return to the (now up-to-date) detail page for the member we
-        // just edited, instead of leaving them stranded on an empty screen.
         if (id) openMemberDetail(id);
       });
 
@@ -2775,26 +2942,45 @@
         document.getElementById("mdJoiningDate").textContent = fmtDate(m.joiningDate);
 
         const hist = (m.payments || []).slice().sort((a, b) => b.paidOn.localeCompare(a.paidOn));
+        const mostRecent = mostRecentlyRecordedPayment(m);
         const histWrap = document.getElementById("mdHistory");
         const histEmpty = document.getElementById("mdHistoryEmpty");
         if (hist.length === 0) { histWrap.innerHTML = ""; histEmpty.style.display = "block"; }
         else {
           histEmpty.style.display = "none";
-          // Every past payment is tappable — you can pull up (and share)
-          // its receipt any time later, not just right after marking paid.
-          histWrap.innerHTML = `<div class="field__hint" style="margin:-4px 0 10px;">Tap any payment to view or send its receipt</div>` + hist.map(p => `
-      <div class="timeline-item" data-payment-id="${p.id}" style="cursor:pointer;">
-        <div class="timeline-item__dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 13 4 4L19 7"/></svg></div>
-        <div style="flex:1;">
-          <div class="timeline-item__title">Payment received</div>
-          <div class="timeline-item__meta">${fmtDate(p.paidOn)} · Receipt #${p.receiptNo}</div>
-        </div>
-        <div class="timeline-item__amount">${fmtMoney(p.amount)}</div>
-      </div>`).join("");
+          histWrap.innerHTML = `<div class="field__hint" style="margin:-4px 0 10px;">Tap any payment to view or send its receipt. Only the most recent payment can be edited or removed.</div>` + hist.map(p => {
+            const isMostRecent = mostRecent && p.id === mostRecent.id;
+            return `
+          <div class="timeline-item">
+            <div class="timeline-item__dot" data-payment-id="${p.id}" style="cursor:pointer;">${CHECK_SVG}</div>
+            <div style="flex:1;cursor:pointer;" data-payment-id="${p.id}">
+              <div class="timeline-item__title">Payment received${isMostRecent ? '<span class="latest-payment-badge">Latest</span>' : ''}</div>
+              <div class="timeline-item__meta">${fmtDate(p.paidOn)} · Receipt #${p.receiptNo}</div>
+            </div>
+            <div class="timeline-item__amount" data-payment-id="${p.id}" style="cursor:pointer;">${fmtMoney(p.amount)}</div>
+            ${isMostRecent ? `<div class="timeline-item__actions">
+              <button class="timeline-item__iconbtn" data-edit-payment-id="${p.id}" aria-label="Edit payment">${EDIT_SVG}</button>
+              <button class="timeline-item__iconbtn timeline-item__iconbtn--danger" data-delete-payment-id="${p.id}" aria-label="Remove payment">${TRASH_SVG}</button>
+            </div>` : ''}
+          </div>`;
+          }).join("");
           histWrap.querySelectorAll("[data-payment-id]").forEach(el => {
             el.addEventListener("click", () => {
               const p = hist.find(x => x.id === el.dataset.paymentId);
               if (p) openReceipt(m, p);
+            });
+          });
+          histWrap.querySelectorAll("[data-edit-payment-id]").forEach(el => {
+            el.addEventListener("click", (e) => {
+              e.stopPropagation();
+              openEditPayment(activeMemberId, el.dataset.editPaymentId);
+            });
+          });
+          histWrap.querySelectorAll("[data-delete-payment-id]").forEach(el => {
+            el.addEventListener("click", (e) => {
+              e.stopPropagation();
+              pendingDeletePaymentId = el.dataset.deletePaymentId;
+              openSheet("sheetConfirmDeletePayment");
             });
           });
         }
@@ -2821,39 +3007,195 @@
       });
 
       /* ===================================================================
-         MARK PAID
+         MARK PAID  /  EDIT PAYMENT  /  DELETE PAYMENT
+         ===================================================================
+         Flow (matches the diagram exactly):
+ 
+           Click "Mark Paid"
+                 ↓
+           Find member
+                 ↓
+           Read current m.nextDueDate
+                 ↓
+           Copy it into temporary draft state   →  markPaidDraft = {...}
+                 ↓
+           computeBillingPeriod()
+                 ↓
+           Fill preview form
+                 ↓
+           ┌─────────────────────┐
+           │                     │
+         Cancel              Confirm
+           │                     │
+           ↓                     ↓
+         Discard draft      Create payment
+         (markPaidDraft        ↓
+          = null, via       Update m.nextDueDate
+          closeSheets)          ↓
+                            Save localStorage
+ 
+         Nothing in this block ever writes to `m` until Confirm is
+         pressed. markPaidDraft is the ONLY place the "baseDueDate" is
+         held while the sheet is open — the member object itself is
+         never touched in the meantime, so Cancel (or the sheet being
+         dismissed any other way) can never cause a due date to
+         advance, however many times it's opened/closed.
          =================================================================== */
-      function refreshMarkPaidPreview() {
-        const m = members.find(x => x.id === activeMemberId); if (!m) return;
-        const paidOn = document.getElementById("smpPaidOn").value || todayISO();
-        const { periodStart, periodEnd, nextDueDate } = computeBillingPeriod(m.nextDueDate, paidOn);
+      let editingPaymentId = null;
+      let pendingDeletePaymentId = null;
+      let markPaidDraft = null; // { memberId, baseDueDate, mode: "new" | "edit", paymentId? }
+
+      function refreshMarkPaidPreview(baseDueDateISO) {
+        console.log("🟡 [BILLING DEBUG] refreshMarkPaidPreview INPUT", {
+          baseDueDateISO,
+          activeMemberId,
+          memberNextDueDate: activeMemberId ? members.find(x => x.id === activeMemberId)?.nextDueDate : null
+        });
+
+        const { periodStart, periodEnd, nextDueDate } = computeBillingPeriod(baseDueDateISO);
+
+        console.log("🟡 [BILLING DEBUG] refreshMarkPaidPreview CALCULATED", {
+          periodStart,
+          periodEnd,
+          nextDueDate
+        });
+
         document.getElementById("smpPeriodStart").value = periodStart;
         document.getElementById("smpPeriodEnd").value = periodEnd;
         document.getElementById("smpNextDueDate").value = nextDueDate;
+
+        const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+        console.log("🟡 [BILLING DEBUG] refreshMarkPaidPreview OUTPUT", {
+          memberNextDueDate: m?.nextDueDate ?? null,
+          domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
+        });
       }
+
       document.getElementById("mdMarkPaid").addEventListener("click", () => {
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
+
+        console.group("🔵 [BILLING DEBUG] MARK PAID CLICK");
+        const clickStartNextDueDate = m.nextDueDate;
+        console.log("MEMBER BEFORE opening Mark Paid preview", {
+          id: m.id,
+          name: m.name,
+          joiningDate: m.joiningDate,
+          nextDueDate: m.nextDueDate,
+          paymentsCount: (m.payments || []).length,
+          payments: JSON.parse(JSON.stringify(m.payments || [])),
+          existingDraft: markPaidDraft ? { ...markPaidDraft } : null
+        });
+        console.trace("TRACE: mdMarkPaid CLICK");
+
+        editingPaymentId = null;
+        markPaidDraft = {
+          memberId: m.id,
+          baseDueDate: m.nextDueDate, // snapshot only — m itself is untouched
+          mode: "new"
+        };
+
+        document.getElementById("smpConfirmBtn").disabled = false;
+
+        document.getElementById("smpTitle").textContent = "Confirm payment";
         document.getElementById("smpDesc").textContent = `Mark ${m.name}'s fee as paid for the period ending ${fmtDate(m.nextDueDate)}?`;
         document.getElementById("smpAmount").value = m.fee;
-
-        // Pre-fill Paid On + the auto-calculated Period Covered / Next Due
-        // Date — but leave every field editable so a manual correction is
-        // always possible. Changing "Paid on" recalculates the preview
-        // (it matters for overdue members — see computeBillingPeriod).
+        document.getElementById("smpPaidOnHint").textContent = "Paid on is just a record of when the money arrived — it doesn't affect the period or next due date below. Those follow the billing cycle, so late payments don't shift it.";
         document.getElementById("smpPaidOn").value = todayISO();
-        refreshMarkPaidPreview();
+
+        refreshMarkPaidPreview(markPaidDraft.baseDueDate);
+
+        console.log("PREVIEW AFTER refreshMarkPaidPreview()", {
+          baseDueDate: markPaidDraft.baseDueDate,
+          periodStart: document.getElementById("smpPeriodStart").value,
+          periodEnd: document.getElementById("smpPeriodEnd").value,
+          previewNextDueDate: document.getElementById("smpNextDueDate").value
+        });
+
+        console.log("MEMBER AFTER preview calculation", {
+          joiningDate: m.joiningDate,
+          nextDueDate: m.nextDueDate,
+          paymentsCount: (m.payments || []).length
+        });
+
+        if (m.nextDueDate !== clickStartNextDueDate) {
+          console.error("🔥🔥 DATE CHANGED DURING Mark Paid OPEN!", {
+            before: clickStartNextDueDate,
+            after: m.nextDueDate
+          });
+          console.trace("🔥 TRACE: Mark Paid opening changed date");
+        } else {
+          console.log("✅ Mark Paid opening DID NOT change member.nextDueDate");
+        }
 
         openSheet("sheetMarkPaid");
+
+        console.log("MEMBER AFTER opening preview", {
+          joiningDate: m.joiningDate,
+          nextDueDate: m.nextDueDate,
+          paymentsCount: (m.payments || []).length
+        });
+        console.groupEnd();
       });
-      document.getElementById("smpPaidOn").addEventListener("change", refreshMarkPaidPreview);
-      // If the user manually edits "period end", keep the next-due-date
-      // field in sync by default (still fully overridable afterwards).
+
+      function openEditPayment(memberId, paymentId) {
+        const m = members.find(x => x.id === memberId); if (!m) return;
+        const p = (m.payments || []).find(x => x.id === paymentId); if (!p) return;
+        const mostRecent = mostRecentlyRecordedPayment(m);
+        if (!mostRecent || mostRecent.id !== paymentId) {
+          toast("Only the most recent payment can be edited", "error");
+          return;
+        }
+        editingPaymentId = paymentId;
+        markPaidDraft = {
+          memberId: m.id,
+          baseDueDate: dueDateBeforeMostRecentPayment(m),
+          mode: "edit",
+          paymentId
+        };
+
+        document.getElementById("smpConfirmBtn").disabled = false;
+
+        document.getElementById("smpTitle").textContent = "Edit payment";
+        document.getElementById("smpDesc").textContent = `Editing ${m.name}'s payment recorded on ${fmtDate(p.paidOn)} (Receipt #${p.receiptNo}).`;
+        document.getElementById("smpAmount").value = p.amount;
+        document.getElementById("smpPaidOn").value = p.paidOn;
+        document.getElementById("smpPeriodStart").value = p.periodStart;
+        document.getElementById("smpPeriodEnd").value = p.periodEnd;
+        document.getElementById("smpNextDueDate").value = p.nextDueDate;
+        document.getElementById("smpPaidOnHint").textContent = "Paid on is just a record of when the money arrived — changing it won't recalculate the period or next due date below. Edit those directly if they need to change too.";
+        openSheet("sheetMarkPaid");
+      }
+
+      document.getElementById("smpPaidOn").addEventListener("change", () => { /* intentionally no-op */ });
+
       document.getElementById("smpPeriodEnd").addEventListener("change", () => {
         const pe = document.getElementById("smpPeriodEnd").value;
-        if (isValidISODate(pe)) document.getElementById("smpNextDueDate").value = addDaysISO(pe, 1);
+        const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
+        console.log("🟠 [BILLING DEBUG] PERIOD END CHANGE", {
+          periodEnd: pe,
+          beforeMemberNextDueDate: m?.nextDueDate ?? null,
+          beforeDomNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
+        });
+        if (isValidISODate(pe)) {
+          document.getElementById("smpNextDueDate").value = addDaysISO(pe, 1);
+        }
+        console.log("🟠 [BILLING DEBUG] PERIOD END CHANGE AFTER", {
+          afterMemberNextDueDate: m?.nextDueDate ?? null,
+          afterDomNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
+        });
       });
+
       document.getElementById("smpConfirmBtn").addEventListener("click", () => {
+        const confirmBtn = document.getElementById("smpConfirmBtn");
+        if (confirmBtn.disabled) return;
+
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
+        if (!markPaidDraft || markPaidDraft.memberId !== m.id) {
+          toast("Session expired — please reopen Mark Paid", "error");
+          closeSheets();
+          return;
+        }
+
         const amountRaw = document.getElementById("smpAmount").value;
         const amount = Number(amountRaw);
         const paidOn = document.getElementById("smpPaidOn").value;
@@ -2861,7 +3203,6 @@
         const periodEnd = document.getElementById("smpPeriodEnd").value;
         const nextDueDate = document.getElementById("smpNextDueDate").value;
 
-        // --- validation ---
         if (!amountRaw || isNaN(amount) || amount <= 0) {
           toast("Enter a valid payment amount", "error"); return;
         }
@@ -2880,7 +3221,24 @@
         if (nextDueDate <= periodEnd) {
           toast("Next due date must be after period end", "error"); return;
         }
-        // --- end validation ---
+
+        confirmBtn.disabled = true;
+
+        if (markPaidDraft.mode === "edit") {
+          const p = (m.payments || []).find(x => x.id === markPaidDraft.paymentId);
+          if (!p) { toast("Payment not found", "error"); markPaidDraft = null; closeSheets(); return; }
+          p.amount = amount; p.paidOn = paidOn; p.periodStart = periodStart; p.periodEnd = periodEnd; p.nextDueDate = nextDueDate;
+          console.error("🔥 PAYMENT CONFIRM (EDIT) CHANGES NEXT DUE DATE", { member: m.name, oldNextDueDate: m.nextDueDate, newNextDueDate: nextDueDate });
+          console.trace("TRACE: PAYMENT CONFIRM EDIT");
+          m.nextDueDate = nextDueDate;
+          saveMembers(members);
+          markPaidDraft = null;
+          closeSheets();
+          toast("Payment updated");
+          renderDashboard();
+          openMemberDetail(activeMemberId);
+          return;
+        }
 
         settings.lastReceiptNo = (settings.lastReceiptNo || 0) + 1;
         saveSettings(settings);
@@ -2892,6 +3250,7 @@
         m.nextDueDate = nextDueDate;
         saveMembers(members);
 
+        markPaidDraft = null;
         closeSheets();
         document.getElementById("spsDesc").textContent = `Next due date is now ${fmtDate(m.nextDueDate)}.`;
         openSheet("sheetPaymentSuccess");
@@ -2902,6 +3261,24 @@
       document.getElementById("spsViewReceipt").addEventListener("click", () => {
         closeSheets();
         if (lastPaymentForReceipt) openReceipt(lastPaymentForReceipt.member, lastPaymentForReceipt.payment);
+      });
+
+      document.getElementById("confirmDeletePaymentBtn").addEventListener("click", () => {
+        const m = members.find(x => x.id === activeMemberId); if (!m) return;
+        const mostRecent = mostRecentlyRecordedPayment(m);
+        if (!mostRecent || mostRecent.id !== pendingDeletePaymentId) {
+          toast("Only the most recent payment can be removed", "error");
+          closeSheets();
+          return;
+        }
+        const revertTo = dueDateBeforeMostRecentPayment(m);
+        m.payments = (m.payments || []).filter(p => p.id !== pendingDeletePaymentId);
+        m.nextDueDate = revertTo;
+        saveMembers(members);
+        closeSheets();
+        toast("Payment removed");
+        renderDashboard();
+        openMemberDetail(activeMemberId);
       });
 
       /* ===================================================================
@@ -2932,14 +3309,12 @@
         if (filter === "overdue") return active.filter(m => memberStatus(m) === "overdue");
         if (filter === "due") return active.filter(m => memberStatus(m) === "due");
         if (filter === "upcoming") {
-          // Due within REMINDER_ADVANCE_DAYS days, but not yet due today.
-          // E.g. fee date 1/08 with a 3-day window shows up from 29/07.
           return active.filter(m => {
             const diff = daysDiff(m.nextDueDate);
             return diff > 0 && diff <= REMINDER_ADVANCE_DAYS;
           });
         }
-        return active.filter(m => ["due", "overdue"].includes(memberStatus(m))); // all unpaid
+        return active.filter(m => ["due", "overdue"].includes(memberStatus(m)));
       }
       function reminderRowHtml(m) {
         const st = memberStatus(m);
@@ -2947,19 +3322,19 @@
         let pillClass, pillLabel;
         if (st === "overdue") { pillClass = "pill--overdue"; pillLabel = "Overdue"; }
         else if (st === "due") { pillClass = "pill--due"; pillLabel = "Due Today"; }
-        else { pillClass = "pill--due"; pillLabel = `Due in ${diff}d`; } // upcoming / due soon
+        else { pillClass = "pill--due"; pillLabel = `Due in ${diff}d`; }
         const sentToday = m.lastReminderSentOn === todayISO();
         return `<div class="row" data-member-id="${m.id}">
-    <div class="row__avatar">${initials(m.name)}</div>
-    <div class="row__main">
-      <div class="row__name">${escapeHtml(m.name)}</div>
-      <div class="row__meta">Due ${fmtDate(m.nextDueDate)} · ${fmtMoney(m.fee)}</div>
-    </div>
-    <div class="row__side"><span class="pill ${pillClass}">${pillLabel}</span></div>
-    <button class="row-action-btn ${sentToday ? 'row-action-btn--sent' : 'row-action-btn--whatsapp'}" data-remind-id="${m.id}" aria-label="Send reminder">
-      ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
-    </button>
-  </div>`;
+        <div class="row__avatar">${initials(m.name)}</div>
+        <div class="row__main">
+          <div class="row__name">${escapeHtml(m.name)}</div>
+          <div class="row__meta">Due ${fmtDate(m.nextDueDate)} · ${fmtMoney(m.fee)}</div>
+        </div>
+        <div class="row__side"><span class="pill ${pillClass}">${pillLabel}</span></div>
+        <button class="row-action-btn ${sentToday ? 'row-action-btn--sent' : 'row-action-btn--whatsapp'}" data-remind-id="${m.id}" aria-label="Send reminder">
+          ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
+        </button>
+      </div>`;
       }
       function renderReminders() {
         const active = members.filter(m => m.status !== "inactive");
@@ -2988,9 +3363,6 @@
         c.addEventListener("click", () => { reminderFilter = c.dataset.rfilter; renderReminders(); });
       });
 
-      // Sticky bottom "Send All" bar — shared between the Reminders tab and
-      // the Members tab. Always sends whichever queue was last computed by
-      // the view that is currently visible.
       let sendAllBar = null;
       let sendAllQueue = [];
       function updateSendAllBar(count, queue, forView) {
@@ -2998,17 +3370,15 @@
           sendAllBar = document.createElement("div");
           sendAllBar.className = "bottom-action-bar";
           sendAllBar.innerHTML = `<button class="btn btn--whatsapp" id="sendAllBtn">
-      ${WHATSAPP_SVG}
-      Send All (<span id="sendAllCount">0</span>)
-    </button>`;
+          ${WHATSAPP_SVG}
+          Send All (<span id="sendAllCount">0</span>)
+        </button>`;
           document.body.appendChild(sendAllBar);
           document.getElementById("sendAllBtn").addEventListener("click", () => startBulkReminders(sendAllQueue));
         }
         const onRemindersTab = document.getElementById("viewReminders").classList.contains("active");
         const onMembersTab = document.getElementById("viewMembers").classList.contains("active");
         const isCurrentView = (forView === "reminders" && onRemindersTab) || (forView === "members" && onMembersTab);
-        // Only the queue belonging to whichever tab is actually visible
-        // should drive the bar — ignore updates from the hidden tab.
         if (!isCurrentView) return;
         sendAllQueue = queue;
         document.getElementById("sendAllCount").textContent = count;
@@ -3035,11 +3405,11 @@
           : `${WHATSAPP_SVG} Open Next Chat (${escapeHtml(bulkQueue[bulkIndex]?.name || "")})`;
 
         document.getElementById("brQueue").innerHTML = bulkQueue.map((m, i) => `
-    <div class="row" style="${i < bulkIndex ? 'opacity:.5;' : ''}">
-      <div class="row__avatar">${initials(m.name)}</div>
-      <div class="row__main"><div class="row__name">${escapeHtml(m.name)}</div><div class="row__meta">+91 ${m.whatsapp}</div></div>
-      <div class="row__side"><span class="pill ${i < bulkIndex ? 'pill--paid' : 'pill--inactive'}">${i < bulkIndex ? 'Sent' : 'Pending'}</span></div>
-    </div>`).join("");
+        <div class="row" style="${i < bulkIndex ? 'opacity:.5;' : ''}">
+          <div class="row__avatar">${initials(m.name)}</div>
+          <div class="row__main"><div class="row__name">${escapeHtml(m.name)}</div><div class="row__meta">+91 ${m.whatsapp}</div></div>
+          <div class="row__side"><span class="pill ${i < bulkIndex ? 'pill--paid' : 'pill--inactive'}">${i < bulkIndex ? 'Sent' : 'Pending'}</span></div>
+        </div>`).join("");
       }
       document.getElementById("brSendNext").addEventListener("click", () => {
         if (bulkIndex >= bulkQueue.length) return;
@@ -3058,18 +3428,7 @@
          RECEIPT
          =================================================================== */
       function openReceipt(m, payment) {
-        // Always re-fetch the live member record by id. Every current
-        // call site already passes a freshly-looked-up member, but doing
-        // this here too means the receipt can NEVER show a stale
-        // Joining Date, even if a future code change passes in an old
-        // cached member object.
         const liveMember = members.find(x => x.id === m.id) || m;
-
-        // Prefer the payment's OWN stored nextDueDate (set at the time the
-        // payment was made) so a receipt pulled up later for an older
-        // payment still reflects what was true then. Falls back to
-        // periodEnd + 1 day for payments recorded before this field existed
-        // (e.g. from an older backup).
         const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
 
         document.getElementById("rcGymName").textContent = settings.gymName || "My Gym";
@@ -3094,8 +3453,6 @@
         const text = `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nJoining Date: ${fmtDate(member.joiningDate)}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
         window.open(waLink(member.whatsapp, text), "_blank");
       });
-      // Native device share sheet (SMS, email, other apps) — no download
-      // needed. Shown only where the browser supports it.
       const rcShareAnyBtn = document.getElementById("rcShareAny");
       if (navigator.share) {
         rcShareAnyBtn.style.display = "flex";
@@ -3209,9 +3566,6 @@
             const data = JSON.parse(reader.result);
             if (!data || !Array.isArray(data.members)) throw new Error("Missing members array");
 
-            // Validate & sanitize each member record instead of trusting
-            // the file blindly — a malformed backup could otherwise crash
-            // the app the first time a bad record is rendered.
             const cleanMembers = data.members.map((m, i) => {
               if (!m || typeof m.name !== "string" || !m.name.trim()) {
                 throw new Error(`Member #${i + 1} is missing a name`);
@@ -3289,6 +3643,9 @@
           showView("dashboard");
         }
         applyTheme();
+        if (storageCorruptionDetected) {
+          toast("Some saved data looked corrupted and was reset — a copy of the raw data was kept on this device.", "error");
+        }
       }
       document.getElementById("onboardForm").addEventListener("submit", (e) => {
         e.preventDefault();
@@ -3304,6 +3661,14 @@
       });
 
       init();
+
+      // Initial state snapshot for the billing reproduction test.
+      setTimeout(() => {
+        console.log("================ BILLING DEBUG READY ================");
+        billingDebugState("INITIAL STATE");
+        console.log("TEST SEQUENCE: Mark Paid -> Cancel -> Mark Paid again. Do NOT Confirm.");
+        console.log("Expected: member.nextDueDate must stay unchanged after Cancel and on the second Mark Paid open.");
+      }, 0);
 
       /* ------------------------- PWA install / offline ------------------------- */
       if ("serviceWorker" in navigator) {
