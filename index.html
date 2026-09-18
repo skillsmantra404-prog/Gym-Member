@@ -1782,6 +1782,25 @@
           </button>
         </div>
 
+        <div class="settings-title">Default Fees</div>
+        <div class="card" style="padding:0;">
+          <button class="list-item" id="settingsEditFees">
+            <span class="list-item__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <path
+                  d="M12 1v22M17.5 5.5A4.5 4.5 0 0 0 13 2h-2a4 4 0 0 0 0 8h2a4 4 0 0 1 0 8h-2a4.5 4.5 0 0 1-4.5-3.5" />
+              </svg></span>
+            <span class="list-item__main">
+              <span class="list-item__title">Gym & treadmill fees</span>
+              <span class="list-item__desc" id="settingsFeesDesc">Prefilled when you add a new member</span>
+            </span>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" stroke-linejoin="round" style="color:var(--text-3);">
+              <path d="m9 18 6-6-6-6" />
+            </svg>
+          </button>
+        </div>
+
         <div class="settings-title">Appearance</div>
         <div class="card">
           <div style="font-size:13px;font-weight:700;color:var(--text-2);margin-bottom:8px;">Theme</div>
@@ -1839,7 +1858,7 @@
                 data</span><span class="list-item__desc">Permanently delete everything</span></span>
           </button>
         </div>
-        <div class="app-version">Gym Manager · Works fully offline · v1.0.3</div>
+        <div class="app-version">Gym Manager · Works fully offline · v1.1.0</div>
       </section>
     </main>
 
@@ -1912,16 +1931,43 @@
           </div>
         </div>
         <div class="field">
-          <label class="field__label">Monthly fee</label>
+          <label class="field__label">Monthly gym fee</label>
           <div class="field__prefix-input">
             <span class="field__prefix">₹</span>
             <input id="mfFee" type="number" inputmode="decimal" placeholder="1000" min="1" step="1" required>
           </div>
         </div>
         <div class="field">
-          <label class="field__label">Joining date/Fee Paid Date</label>
+          <label class="field__label">Plan</label>
+          <div class="segmented" id="mfPlanSeg" style="margin:0;">
+            <button type="button" class="segmented__opt active" data-plan="gym">Gym only</button>
+            <button type="button" class="segmented__opt" data-plan="gym_treadmill">Gym + Treadmill</button>
+          </div>
+        </div>
+        <div class="field" id="mfTreadmillField" style="display:none;">
+          <label class="field__label">Monthly treadmill fee</label>
+          <div class="field__prefix-input">
+            <span class="field__prefix">₹</span>
+            <input id="mfTreadmillFee" type="number" inputmode="decimal" placeholder="200" min="1" step="1">
+          </div>
+        </div>
+        <div class="field">
+          <label class="field__label">Payment cycle</label>
+          <div class="segmented" id="mfCycleSeg" style="margin:0;">
+            <button type="button" class="segmented__opt active" data-months="1">Monthly</button>
+            <button type="button" class="segmented__opt" data-months="3">Quarterly</button>
+          </div>
+          <div class="field__hint" id="mfTotalHint"></div>
+        </div>
+        <div class="field">
+          <label class="field__label">Joining date</label>
           <input class="field__input" id="mfJoiningDate" type="date" required>
-          <div class="field__hint">The next due date is calculated automatically from this.</div>
+          <div class="field__hint">Used for records and receipts.</div>
+        </div>
+        <div class="field">
+          <label class="field__label">Current next due date</label>
+          <input class="field__input" id="mfNextDueDate" type="date" required>
+          <div class="field__hint" id="mfNextDueHint"></div>
         </div>
       </form>
     </div>
@@ -1985,7 +2031,7 @@
         <div class="section__title">Membership Info</div>
         <div class="info-grid">
           <div class="info-tile">
-            <div class="info-tile__label">Monthly Fee</div>
+            <div class="info-tile__label">Fee</div>
             <div class="info-tile__value" id="mdFee">—</div>
           </div>
           <div class="info-tile">
@@ -2034,6 +2080,8 @@
               id="rcNumber">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Member</span><span class="receipt-row__value"
               id="rcMember">—</span></div>
+          <div class="receipt-row"><span class="receipt-row__label">Plan</span><span class="receipt-row__value"
+              id="rcPlan">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Joining Date</span><span class="receipt-row__value"
               id="rcJoiningDate">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Paid On</span><span class="receipt-row__value"
@@ -2212,10 +2260,39 @@
         </svg>Import backup (.json)</button>
     </div>
 
+    <div class="sheet" id="sheetConfirmImport" data-sheet>
+      <div class="sheet__handle"></div>
+      <div class="sheet__title">Import will replace current data</div>
+      <div class="sheet__desc">Importing a backup replaces every member and payment currently in the app with what's in
+        the file. If you pick the wrong file — like an old backup — today's data goes with it. A safety copy of what's
+        here now is kept automatically, but it's best to export a fresh backup first if you're not sure.</div>
+      <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
+          class="btn btn--primary" id="confirmImportBtn">Continue</button></div>
+    </div>
+
+    <div class="sheet" id="sheetDefaultFees" data-sheet>
+      <div class="sheet__handle"></div>
+      <div class="sheet__title">Default fees</div>
+      <div class="sheet__desc">These are only starting values for the Add Member form. Changing them never changes any
+        existing member's fee.</div>
+      <div class="field">
+        <label class="field__label">Monthly gym fee</label>
+        <div class="field__prefix-input"><span class="field__prefix">₹</span><input id="defGymFee" type="number"
+            inputmode="decimal" min="1" step="1" placeholder="1000"></div>
+      </div>
+      <div class="field">
+        <label class="field__label">Monthly treadmill fee</label>
+        <div class="field__prefix-input"><span class="field__prefix">₹</span><input id="defTreadmillFee" type="number"
+            inputmode="decimal" min="0" step="1" placeholder="200"></div>
+      </div>
+      <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
+          class="btn btn--primary" id="defaultFeesSaveBtn">Save</button></div>
+    </div>
+
     <div class="sheet" id="sheetTemplate" data-sheet>
       <div class="sheet__handle"></div>
       <div class="sheet__title">Reminder message</div>
-      <div class="sheet__desc">Use {name}, {amount}, {dueDate} and {gymName} — filled in automatically.</div>
+      <div class="sheet__desc">Use {name}, {amount}, {dueDate}, {plan} and {gymName} — filled in automatically.</div>
       <div class="field"><textarea class="field__input" id="templateTextarea"></textarea></div>
       <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
           class="btn btn--primary" id="templateSaveBtn">Save</button></div>
@@ -2246,7 +2323,7 @@
           <button class="segmented__opt" data-rule="fixedday">Fixed day</button>
         </div>
         <div class="field__hint" id="billingRuleHint">Anniversary: next period starts the day after the current due
-          date, and runs one month from there (matches each member's own cycle).</div>
+          date, and runs one full cycle from there (matches each member's own cycle).</div>
       </div>
       <div class="field" id="fixedDayField" style="display:none;">
         <label class="field__label">Fixed day of month (1–28)</label>
@@ -2280,6 +2357,13 @@
   <script>
     /* =====================================================================
        GYM MANAGER — single-file app. Data stored in localStorage.
+
+       v1.1 adds:
+         - Separate gym fee and treadmill fee. A member is either "Gym only"
+           or "Gym + Treadmill"; the amount charged is the sum of the parts.
+         - Monthly or Quarterly payment cycle per member. A quarterly member
+           pays 3x the monthly total and their period/next-due-date advance
+           3 months instead of 1.
        ===================================================================== */
     (function () {
       "use strict";
@@ -2288,6 +2372,8 @@
       const LS_MEMBERS = "gym_members_v1";
       const LS_SETTINGS = "gym_settings_v1";
 
+      // How many days before the due date a member shows up under the
+      // Reminders tab's "Due Soon" chip.
       const REMINDER_ADVANCE_DAYS = 3;
       let storageCorruptionDetected = false;
 
@@ -2298,45 +2384,14 @@
           const parsed = JSON.parse(raw);
           return Array.isArray(parsed) ? parsed : [];
         } catch (e) {
+          // Never silently discard unreadable data — stash the raw string
+          // under a recovery key so nothing is truly lost, and flag it.
           localStorage.setItem(LS_MEMBERS + "_corrupted_" + Date.now(), raw);
           storageCorruptionDetected = true;
           return [];
         }
       }
-      /* ------------------------- BILLING DEBUG ------------------------- */
-      // Temporary diagnostics for: Mark Paid -> Cancel -> Mark Paid again.
-      // These logs DO NOT change billing data. Remove this block after debugging.
-      function billingDebugState(label) {
-        const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-        const nextDueDate = m?.nextDueDate ?? null;
-        const joiningDate = m?.joiningDate ?? null;
-        const payments = m?.payments || [];
-        console.log(`[BILLING DEBUG] ${label}`, {
-          time: new Date().toISOString(),
-          activeMemberId,
-          memberName: m?.name ?? null,
-          joiningDate,
-          nextDueDate,
-          paymentsCount: payments.length,
-          payments: JSON.parse(JSON.stringify(payments)),
-          markPaidDraft: markPaidDraft ? { ...markPaidDraft } : null,
-          domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null,
-          domPeriodStart: document.getElementById("smpPeriodStart")?.value ?? null,
-          domPeriodEnd: document.getElementById("smpPeriodEnd")?.value ?? null
-        });
-        return { nextDueDate, joiningDate, paymentsCount: payments.length };
-      }
-
       function saveMembers(list) {
-        const snapshot = list.map(x => ({
-          id: x.id,
-          name: x.name,
-          joiningDate: x.joiningDate,
-          nextDueDate: x.nextDueDate,
-          paymentsCount: (x.payments || []).length
-        }));
-        console.log("[BILLING DEBUG] saveMembers()", snapshot);
-        console.trace("[BILLING DEBUG] saveMembers() CALL STACK");
         try {
           localStorage.setItem(LS_MEMBERS, JSON.stringify(list));
           return true;
@@ -2375,14 +2430,73 @@
         template: "Hi {name}, your gym fee of {amount} was due on {dueDate}. Please pay at the earliest. - {gymName}",
         lastReceiptNo: 0,
         billingRule: "anniversary", // "anniversary" | "fixedday"
-        billingFixedDay: 1
+        billingFixedDay: 1,
+        defaultGymFee: 1000,
+        defaultTreadmillFee: 200
       };
+      // Backfill for users upgrading from an older version without these keys
       if (!settings.billingRule) settings.billingRule = "anniversary";
       if (!settings.billingFixedDay) settings.billingFixedDay = 1;
+      if (settings.defaultGymFee === undefined) settings.defaultGymFee = 1000;
+      if (settings.defaultTreadmillFee === undefined) settings.defaultTreadmillFee = 200;
+
+      /* ------------------------- FEE / PLAN MODEL -------------------------
+         A member now stores:
+           gymFee        — monthly gym charge
+           treadmillFee  — monthly treadmill add-on charge (0 if unused)
+           hasTreadmill  — whether the add-on applies
+           billingMonths — 1 (monthly) or 3 (quarterly)
+         m.fee is kept in sync as the MONTHLY total purely for backward
+         compatibility with older backups and any leftover reference.
+         ----------------------------------------------------------------- */
+      function monthlyFee(m) {
+        return Number(m.gymFee || 0) + (m.hasTreadmill ? Number(m.treadmillFee || 0) : 0);
+      }
+      // What the member actually pays each time a bill comes due — monthly
+      // total multiplied by the number of months in their cycle.
+      function periodFee(m) {
+        return monthlyFee(m) * cycleMonths(m);
+      }
+      function cycleMonths(m) {
+        return Number(m.billingMonths) === 3 ? 3 : 1;
+      }
+      function cycleLabel(m) {
+        return cycleMonths(m) === 3 ? "Quarterly" : "Monthly";
+      }
+      function cycleSuffix(m) {
+        return cycleMonths(m) === 3 ? "/quarter" : "/month";
+      }
+      function planLabel(m) {
+        return (m.hasTreadmill ? "Gym + Treadmill" : "Gym only") + " · " + cycleLabel(m);
+      }
+      // Upgrade older member records in place. Anyone saved before this
+      // version has only a flat `fee`, which was always a monthly gym-only
+      // charge — so that becomes gymFee, with no treadmill and a monthly
+      // cycle. Existing due dates and payment history are untouched.
+      function migrateMember(m) {
+        if (m.gymFee === undefined || m.gymFee === null) m.gymFee = Number(m.fee) || 0;
+        if (m.treadmillFee === undefined || m.treadmillFee === null) m.treadmillFee = 0;
+        if (m.hasTreadmill === undefined || m.hasTreadmill === null) m.hasTreadmill = false;
+        if (m.billingMonths === undefined || m.billingMonths === null) m.billingMonths = 1;
+        m.fee = monthlyFee(m);
+        return m;
+      }
+      let migrationChanged = false;
+      members.forEach(m => {
+        const before = JSON.stringify([m.gymFee, m.treadmillFee, m.hasTreadmill, m.billingMonths]);
+        migrateMember(m);
+        if (JSON.stringify([m.gymFee, m.treadmillFee, m.hasTreadmill, m.billingMonths]) !== before) migrationChanged = true;
+      });
+      if (migrationChanged) saveMembers(members);
 
       /* ------------------------- UTILS ------------------------- */
       function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
 
+      // IMPORTANT: use LOCAL date parts, never toISOString(), to build/format
+      // "YYYY-MM-DD" strings. toISOString() converts to UTC, and for any
+      // timezone ahead of UTC (e.g. India, UTC+5:30) a local midnight
+      // timestamp rolls back to the previous UTC day — silently knocking a
+      // day off every date the app stores.
       function toLocalISO(d) {
         const y = d.getFullYear();
         const m = String(d.getMonth() + 1).padStart(2, "0");
@@ -2411,7 +2525,7 @@
         d.setDate(d.getDate() + days);
         return toLocalISO(d);
       }
-      function daysDiff(iso) {
+      function daysDiff(iso) { // due date minus today, in days
         const a = new Date(todayISO() + "T00:00:00");
         const b = new Date(iso + "T00:00:00");
         return Math.round((b - a) / 86400000);
@@ -2424,22 +2538,47 @@
       function cleanPhone(v) { return (v || "").replace(/\D/g, "").slice(-10); }
       function isValidIndianMobile(v) { return /^[6-9]\d{9}$/.test(v || ""); }
 
+      // Last calendar day of the month that contains the given ISO date.
       function endOfMonthISO(iso) {
         const d = new Date(iso + "T00:00:00");
         return toLocalISO(new Date(d.getFullYear(), d.getMonth() + 1, 0));
       }
 
-      function computeBillingPeriod(baseDueDateISO) {
+      // Given a BASE due date (the due date the payment is clearing) and the
+      // number of MONTHS the payment covers (1 for monthly, 3 for
+      // quarterly), work out the period covered and the resulting new
+      // next-due-date.
+      //
+      // This is ALWAYS based on the due date being cleared, never on the
+      // date the payment actually happens to be made. Whether the member
+      // pays exactly on time or several weeks late, the period and next due
+      // date come out the same, because the billing cycle itself hasn't
+      // shifted — only how late they were in paying it. The "Paid on" date
+      // is purely a record of when the money arrived; it must never feed
+      // into this calculation.
+      //
+      // periodEnd is the LAST DAY ACTUALLY COVERED (inclusive) — e.g. due
+      // 5/08 monthly -> period 5/08 to 4/09, next due 5/09; due 5/08
+      // quarterly -> period 5/08 to 4/11, next due 5/11. nextDueDate is
+      // always periodEnd + 1 day.
+      //
+      // Follows whichever billing rule is set in Settings -> Billing:
+      //   "anniversary" (default): period runs from the due date being
+      //     cleared for one full cycle.
+      //   "fixedday": every period starts on a fixed day-of-month.
+      function computeBillingPeriod(baseDueDateISO, months) {
+        const span = Number(months) === 3 ? 3 : 1;
         let periodStart, cycleStart;
         if (settings.billingRule === "fixedday") {
           const day = Math.min(28, Math.max(1, Number(settings.billingFixedDay) || 1));
           const base = new Date(baseDueDateISO + "T00:00:00");
           base.setDate(day);
           periodStart = toLocalISO(base);
-          cycleStart = addMonthsISO(periodStart, 1);
+          cycleStart = addMonthsISO(periodStart, span);
         } else {
+          // anniversary (default)
           periodStart = baseDueDateISO;
-          cycleStart = addMonthsISO(baseDueDateISO, 1);
+          cycleStart = addMonthsISO(baseDueDateISO, span);
         }
         const periodEnd = addDaysISO(cycleStart, -1);
         return { periodStart, periodEnd, nextDueDate: cycleStart };
@@ -2450,7 +2589,7 @@
         const diff = daysDiff(m.nextDueDate);
         if (diff < 0) return "overdue";
         if (diff === 0) return "due";
-        return "paid";
+        return "paid"; // paid up / upcoming
       }
 
       /* ------------------------- TOAST ------------------------- */
@@ -2519,147 +2658,19 @@
       /* ------------------------- SHEETS ------------------------- */
       const overlay = document.getElementById("overlay");
       function openSheet(id) {
-        if (id === "sheetMarkPaid") {
-          const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-          console.log("🟢 [BILLING DEBUG] openSheet(sheetMarkPaid)", {
-            memberNextDueDate: m?.nextDueDate ?? null,
-            markPaidDraft: markPaidDraft ? { ...markPaidDraft } : null,
-            domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
-          });
-          console.trace("TRACE: openSheet(sheetMarkPaid)");
-        }
         document.querySelectorAll(".sheet").forEach(s => s.classList.remove("active"));
         document.getElementById(id).classList.add("active");
         overlay.classList.add("active");
       }
-      function closeSheets(reason = "UNKNOWN") {
-        console.group(`🟠 [BILLING DEBUG] closeSheets(${reason})`);
-
-        const mBefore = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-        const beforeNextDueDate = mBefore?.nextDueDate ?? null;
-        const beforeJoiningDate = mBefore?.joiningDate ?? null;
-        const beforePaymentsCount = (mBefore?.payments || []).length;
-
-        console.log("BEFORE closeSheets", {
-          reason,
-          activeMemberId,
-          memberName: mBefore?.name ?? null,
-          joiningDate: beforeJoiningDate,
-          nextDueDate: beforeNextDueDate,
-          paymentsCount: beforePaymentsCount,
-          markPaidDraft: markPaidDraft ? { ...markPaidDraft } : null,
-          domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null,
-          domPeriodStart: document.getElementById("smpPeriodStart")?.value ?? null,
-          domPeriodEnd: document.getElementById("smpPeriodEnd")?.value ?? null
-        });
-        console.trace("TRACE: closeSheets() called from");
-
-        overlay.classList.remove("active");
-        document.querySelectorAll(".sheet").forEach(s => s.classList.remove("active"));
-
+      function closeSheets() {
+        overlay.classList.remove("active"); document.querySelectorAll(".sheet").forEach(s => s.classList.remove("active"));
+        // Leaving the Mark Paid / Edit Payment sheet always clears edit
+        // mode, so a later "Mark Paid" tap never reuses stale edit state.
         editingPaymentId = null;
         pendingDeletePaymentId = null;
-        markPaidDraft = null;
-
-        const mAfter = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-        const afterNextDueDate = mAfter?.nextDueDate ?? null;
-        const afterJoiningDate = mAfter?.joiningDate ?? null;
-        const afterPaymentsCount = (mAfter?.payments || []).length;
-
-        console.log("AFTER closeSheets", {
-          reason,
-          joiningDate: afterJoiningDate,
-          nextDueDate: afterNextDueDate,
-          paymentsCount: afterPaymentsCount,
-          markPaidDraft,
-          domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
-        });
-
-        if (beforeNextDueDate !== afterNextDueDate) {
-          console.error("🔥🔥 DATE CHANGED INSIDE closeSheets()!", {
-            reason,
-            beforeNextDueDate,
-            afterNextDueDate
-          });
-          console.trace("🔥 TRACE: nextDueDate changed during closeSheets()");
-        } else {
-          console.log("✅ nextDueDate DID NOT change inside closeSheets()");
-        }
-
-        console.groupEnd();
-
-        // Check again on the next event-loop turn. This catches another
-        // handler/function that mutates the member immediately after close.
-        setTimeout(() => {
-          const mLater = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-          const laterNextDueDate = mLater?.nextDueDate ?? null;
-          console.log(`[BILLING DEBUG] 0ms AFTER closeSheets(${reason})`, {
-            nextDueDate: laterNextDueDate,
-            expectedUnchanged: beforeNextDueDate,
-            changedAfterClose: laterNextDueDate !== beforeNextDueDate,
-            markPaidDraft,
-            domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
-          });
-          if (laterNextDueDate !== beforeNextDueDate) {
-            console.error("🔥🔥 DATE CHANGED AFTER closeSheets() RETURNED!", {
-              reason,
-              beforeNextDueDate,
-              laterNextDueDate
-            });
-            console.trace("🔥 TRACE: date changed after closeSheets()");
-          }
-        }, 0);
       }
-
-      overlay.addEventListener("click", (e) => {
-        if (e.target !== overlay) return;
-        console.log("🟣 [BILLING DEBUG] OVERLAY CLICK");
-        console.trace("TRACE: overlay click");
-        billingDebugState("BEFORE OVERLAY CLOSE");
-        closeSheets("OVERLAY CLICK");
-      });
-
-      document.querySelectorAll("[data-close-sheet]").forEach(b => {
-        b.addEventListener("click", function (e) {
-          const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-          const beforeNextDueDate = m?.nextDueDate ?? null;
-
-          console.group("🔴 [BILLING DEBUG] CANCEL / CLOSE BUTTON CLICK");
-          console.log("Clicked element:", this);
-          console.log("Button text:", this.textContent.trim());
-          console.log("Sheet containing button:", this.closest(".sheet")?.id);
-          console.log("BEFORE CANCEL BUTTON HANDLER", {
-            nextDueDate: beforeNextDueDate,
-            joiningDate: m?.joiningDate ?? null,
-            paymentsCount: (m?.payments || []).length,
-            markPaidDraft: markPaidDraft ? { ...markPaidDraft } : null,
-            domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
-          });
-          console.trace("TRACE: CANCEL BUTTON CLICK");
-
-          closeSheets("CANCEL / CLOSE BUTTON");
-
-          const mAfter = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-          console.log("AFTER CANCEL BUTTON HANDLER", {
-            nextDueDate: mAfter?.nextDueDate ?? null,
-            joiningDate: mAfter?.joiningDate ?? null,
-            paymentsCount: (mAfter?.payments || []).length,
-            markPaidDraft,
-            domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
-          });
-
-          if (beforeNextDueDate !== (mAfter?.nextDueDate ?? null)) {
-            console.error("🔥🔥 CANCEL BUTTON CHANGED THE DATE!", {
-              beforeNextDueDate,
-              afterNextDueDate: mAfter?.nextDueDate ?? null
-            });
-            console.trace("🔥 TRACE: CANCEL BUTTON DATE CHANGE");
-          } else {
-            console.log("✅ CANCEL BUTTON DID NOT CHANGE member.nextDueDate");
-          }
-          console.groupEnd();
-        });
-      });
+      overlay.addEventListener("click", (e) => { if (e.target === overlay) closeSheets(); });
+      document.querySelectorAll("[data-close-sheet]").forEach(b => b.addEventListener("click", closeSheets));
 
       /* ===================================================================
          DASHBOARD
@@ -2669,15 +2680,15 @@
       const daysSince = lastBackup ? Math.floor((Date.now() - lastBackup.getTime()) / 86400000) : Infinity;
       if (members.length > 0 && daysSince >= 7) {
         reminderWrap.innerHTML = `<div class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
-                <div class="list-item__icon" style="background:var(--due-bg);color:var(--due);flex-shrink:0;">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
-                </div>
-                <div style="flex:1;">
-                  <div style="font-size:13.5px;font-weight:700;">${lastBackup ? "Backup is " + daysSince + " days old" : "You haven't backed up yet"}</div>
-                  <div style="font-size:12px;color:var(--text-2);">Your data only lives in this browser. Back it up so it's not lost if browsing data is cleared.</div>
-                </div>
-                <button class="btn btn--secondary" style="width:auto;height:38px;padding:0 14px;flex-shrink:0;" id="dashBackupNowBtn">Backup</button>
-              </div>`;
+            <div class="list-item__icon" style="background:var(--due-bg);color:var(--due);flex-shrink:0;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:13.5px;font-weight:700;">${lastBackup ? "Backup is " + daysSince + " days old" : "You haven't backed up yet"}</div>
+              <div style="font-size:12px;color:var(--text-2);">Your data only lives in this browser. Back it up so it's not lost if browsing data is cleared.</div>
+            </div>
+            <button class="btn btn--secondary" style="width:auto;height:38px;padding:0 14px;flex-shrink:0;" id="dashBackupNowBtn">Backup</button>
+          </div>`;
         document.getElementById("dashBackupNowBtn").addEventListener("click", exportBackup);
       } else {
         reminderWrap.innerHTML = "";
@@ -2708,10 +2719,10 @@
         const wrap = document.getElementById("dashAttention");
         if (attention.length === 0) {
           wrap.innerHTML = `<div class="empty" style="padding:30px 20px;">
-          <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
-          <div class="empty__title">Nothing due right now</div>
-          <div class="empty__desc">Members needing a reminder or payment will show up here.</div>
-        </div>`;
+      <div class="empty__icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 12 2 2 4-4"/><circle cx="12" cy="12" r="9"/></svg></div>
+      <div class="empty__title">Nothing due right now</div>
+      <div class="empty__desc">Members needing a reminder or payment will show up here.</div>
+    </div>`;
         } else {
           wrap.innerHTML = attention.map(memberRowHtml).join("");
           bindMemberRowClicks(wrap);
@@ -2728,10 +2739,18 @@
         const list = (m.payments || []).slice().sort((a, b) => b.paidOn.localeCompare(a.paidOn));
         return list[0] || null;
       }
+      // The payment that most recently changed the member's nextDueDate is
+      // always the LAST element of the payments array (the order they were
+      // recorded in) — not necessarily the one with the latest "Paid On"
+      // date, since Paid On can be backdated. Editing/deleting must only
+      // ever touch this one, because it's the only payment we can safely
+      // "undo" without recomputing every payment after it.
       function mostRecentlyRecordedPayment(m) {
         const list = m.payments || [];
         return list.length ? list[list.length - 1] : null;
       }
+      // What the member's nextDueDate was immediately BEFORE the most
+      // recently recorded payment.
       function dueDateBeforeMostRecentPayment(m) {
         const list = m.payments || [];
         if (list.length <= 1) return m.joiningDate;
@@ -2746,15 +2765,15 @@
         if (st === "due" || st === "overdue") {
           const sentToday = m.lastReminderSentOn === todayISO();
           return `<button class="row-action-btn ${sentToday ? 'row-action-btn--sent' : 'row-action-btn--whatsapp'}" data-remind-id="${m.id}" aria-label="Send reminder">
-          ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
-        </button>`;
+      ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
+    </button>`;
         }
         if (st === "paid") {
           const lp = latestPaymentOf(m);
           if (!lp) return "";
           return `<button class="row-action-btn row-action-btn--receipt" data-receipt-id="${m.id}" aria-label="View receipt">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2V8Z"/><path d="M9 12h6M9 16h6M9 8h2"/></svg>
-        </button>`;
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16l3-2 3 2 3-2 3 2V8Z"/><path d="M9 12h6M9 16h6M9 8h2"/></svg>
+    </button>`;
         }
         return "";
       }
@@ -2762,18 +2781,21 @@
         const st = memberStatus(m);
         const pillClass = { due: "pill--due", overdue: "pill--overdue", paid: "pill--paid", inactive: "pill--inactive" }[st];
         const pillLabel = { due: "Due Today", overdue: "Overdue", paid: "Paid Up", inactive: "Inactive" }[st];
+        // Row meta now also carries the plan so gym-only vs gym+treadmill is
+        // visible at a glance without opening the member.
+        const planBit = (m.hasTreadmill ? "Gym + Treadmill" : "Gym") + (cycleMonths(m) === 3 ? " · Quarterly" : "");
         return `<div class="row" data-member-id="${m.id}">
-        <div class="row__avatar">${initials(m.name)}</div>
-        <div class="row__main">
-          <div class="row__name">${escapeHtml(m.name)}</div>
-          <div class="row__meta">${st === "inactive" ? "Inactive" : "Due " + fmtDate(m.nextDueDate)}</div>
-        </div>
-        <div class="row__side">
-          <span class="pill ${pillClass}">${pillLabel}</span>
-          <span class="row__fee">${fmtMoney(m.fee)}</span>
-        </div>
-        ${rowActionBtnHtml(m)}
-      </div>`;
+    <div class="row__avatar">${initials(m.name)}</div>
+    <div class="row__main">
+      <div class="row__name">${escapeHtml(m.name)}</div>
+      <div class="row__meta">${st === "inactive" ? "Inactive" : "Due " + fmtDate(m.nextDueDate)} · ${planBit}</div>
+    </div>
+    <div class="row__side">
+      <span class="pill ${pillClass}">${pillLabel}</span>
+      <span class="row__fee">${fmtMoney(periodFee(m))}</span>
+    </div>
+    ${rowActionBtnHtml(m)}
+    </div>`;
       }
       function bindMemberRowClicks(container) {
         container.querySelectorAll("[data-member-id]").forEach(row => {
@@ -2853,11 +2875,80 @@
          ADD / EDIT MEMBER
          =================================================================== */
       const memberForm = document.getElementById("memberForm");
+
+      // Joining date and next-due-date are separate: joining date is the
+      // historical record, next due date is what actually drives billing.
+      // They only auto-mirror for a genuinely new member added today.
+      let mfNextDueManuallySet = false;
+      document.getElementById("mfJoiningDate").addEventListener("input", () => {
+        if (!mfNextDueManuallySet && !document.getElementById("mfId").value) {
+          document.getElementById("mfNextDueDate").value = document.getElementById("mfJoiningDate").value;
+        }
+      });
+      document.getElementById("mfNextDueDate").addEventListener("input", () => { mfNextDueManuallySet = true; });
+
+      /* ---- plan / cycle controls on the member form ---- */
+      function mfSelectedPlan() {
+        const b = document.querySelector("#mfPlanSeg .segmented__opt.active");
+        return b ? b.dataset.plan : "gym";
+      }
+      function mfSelectedMonths() {
+        const b = document.querySelector("#mfCycleSeg .segmented__opt.active");
+        return b && b.dataset.months === "3" ? 3 : 1;
+      }
+      function mfSetPlan(plan) {
+        document.querySelectorAll("#mfPlanSeg .segmented__opt").forEach(b => b.classList.toggle("active", b.dataset.plan === plan));
+        document.getElementById("mfTreadmillField").style.display = plan === "gym_treadmill" ? "block" : "none";
+      }
+      function mfSetMonths(months) {
+        const val = Number(months) === 3 ? "3" : "1";
+        document.querySelectorAll("#mfCycleSeg .segmented__opt").forEach(b => b.classList.toggle("active", b.dataset.months === val));
+      }
+      // Live "what will actually be charged" line, so the total is never a
+      // surprise at Mark Paid time.
+      function mfRefreshTotal() {
+        const gym = Number(document.getElementById("mfFee").value) || 0;
+        const tread = mfSelectedPlan() === "gym_treadmill" ? (Number(document.getElementById("mfTreadmillFee").value) || 0) : 0;
+        const months = mfSelectedMonths();
+        const monthly = gym + tread;
+        const total = monthly * months;
+        const hint = document.getElementById("mfTotalHint");
+        if (!monthly) { hint.textContent = ""; return; }
+        hint.textContent = months === 3
+          ? `Charged ${fmtMoney(total)} every 3 months (${fmtMoney(gym)} gym${tread ? " + " + fmtMoney(tread) + " treadmill" : ""} = ${fmtMoney(monthly)}/month × 3).`
+          : `Charged ${fmtMoney(total)} every month (${fmtMoney(gym)} gym${tread ? " + " + fmtMoney(tread) + " treadmill" : ""}).`;
+      }
+      document.getElementById("mfPlanSeg").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-plan]"); if (!btn) return;
+        mfSetPlan(btn.dataset.plan);
+        // Prefill the treadmill fee with the configured default the first
+        // time the add-on is switched on and the box is still empty.
+        const tf = document.getElementById("mfTreadmillFee");
+        if (btn.dataset.plan === "gym_treadmill" && !tf.value) tf.value = settings.defaultTreadmillFee || "";
+        mfRefreshTotal();
+      });
+      document.getElementById("mfCycleSeg").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-months]"); if (!btn) return;
+        mfSetMonths(btn.dataset.months);
+        mfRefreshTotal();
+      });
+      document.getElementById("mfFee").addEventListener("input", mfRefreshTotal);
+      document.getElementById("mfTreadmillFee").addEventListener("input", mfRefreshTotal);
+
       function openAddMember() {
         memberForm.reset();
         document.getElementById("mfId").value = "";
         document.getElementById("memberFormTitle").textContent = "Add Member";
+        document.getElementById("mfFee").value = settings.defaultGymFee || "";
+        document.getElementById("mfTreadmillFee").value = "";
+        mfSetPlan("gym");
+        mfSetMonths(1);
         document.getElementById("mfJoiningDate").value = todayISO();
+        document.getElementById("mfNextDueDate").value = todayISO();
+        document.getElementById("mfNextDueDate").disabled = false;
+        document.getElementById("mfNextDueHint").textContent = "For a brand-new member this is usually today. For an existing member you're adding for the first time, set this to when their fee is actually next due.";
+        mfNextDueManuallySet = false;
+        mfRefreshTotal();
         openPage("pageMemberForm");
       }
       function openEditMember(id) {
@@ -2865,9 +2956,27 @@
         document.getElementById("mfId").value = m.id;
         document.getElementById("mfName").value = m.name;
         document.getElementById("mfWhatsapp").value = m.whatsapp;
-        document.getElementById("mfFee").value = m.fee;
+        document.getElementById("mfFee").value = m.gymFee;
+        document.getElementById("mfTreadmillFee").value = m.treadmillFee || "";
+        mfSetPlan(m.hasTreadmill ? "gym_treadmill" : "gym");
+        mfSetMonths(cycleMonths(m));
         document.getElementById("mfJoiningDate").value = m.joiningDate;
+
+        // Due date is derived from payment history once payments exist, so
+        // the field is locked then — changing it here would desync the two.
+        const nextDueInput = document.getElementById("mfNextDueDate");
+        nextDueInput.value = m.nextDueDate;
+        const hasPayments = (m.payments || []).length > 0;
+        nextDueInput.disabled = hasPayments;
+        document.getElementById("mfNextDueHint").textContent = hasPayments
+          ? "This member already has recorded payments, so their due date is tracked from those. Use Mark Paid, or edit the latest payment, to change it."
+          : "For a member who already joined a while ago, set this to when their fee is actually next due.";
+        mfNextDueManuallySet = true;
+        mfRefreshTotal();
+
         document.getElementById("memberFormTitle").textContent = "Edit Member";
+        // Member Detail sits later in the page markup, so with both pages
+        // "active" it paints on top of the edit form. Close Detail first.
         closePage("pageMemberDetail");
         openPage("pageMemberForm");
       }
@@ -2876,17 +2985,26 @@
         const id = document.getElementById("mfId").value;
         const name = document.getElementById("mfName").value.trim();
         const whatsapp = cleanPhone(document.getElementById("mfWhatsapp").value);
-        const fee = Number(document.getElementById("mfFee").value);
+        const gymFee = Number(document.getElementById("mfFee").value);
+        const plan = mfSelectedPlan();
+        const hasTreadmill = plan === "gym_treadmill";
+        const treadmillFee = hasTreadmill ? Number(document.getElementById("mfTreadmillFee").value) : 0;
+        const billingMonths = mfSelectedMonths();
         const joiningDate = document.getElementById("mfJoiningDate").value;
+        const nextDueDate = document.getElementById("mfNextDueDate").value;
 
+        // --- validation ---
         if (!name || name.length < 2) {
           toast("Please enter a valid name", "error"); return;
         }
         if (!isValidIndianMobile(whatsapp)) {
           toast("Enter a valid 10-digit WhatsApp number", "error"); return;
         }
-        if (!fee || fee <= 0 || fee > 1000000) {
-          toast("Fee must be a positive amount", "error"); return;
+        if (!gymFee || gymFee <= 0 || gymFee > 1000000) {
+          toast("Gym fee must be a positive amount", "error"); return;
+        }
+        if (hasTreadmill && (isNaN(treadmillFee) || treadmillFee <= 0 || treadmillFee > 1000000)) {
+          toast("Enter a valid treadmill fee, or switch the plan to Gym only", "error"); return;
         }
         if (!isValidISODate(joiningDate)) {
           toast("Please pick a valid joining date", "error"); return;
@@ -2894,22 +3012,39 @@
         if (joiningDate > todayISO()) {
           toast("Joining date can't be in the future", "error"); return;
         }
+        if (!isValidISODate(nextDueDate)) {
+          toast("Please pick a valid next due date", "error"); return;
+        }
+        if (nextDueDate < joiningDate) {
+          toast("Next due date can't be before the joining date", "error"); return;
+        }
         const dup = members.find(x => x.whatsapp === whatsapp && x.id !== id);
         if (dup) {
           toast(`This number is already used by ${dup.name}`, "error"); return;
         }
+        // --- end validation ---
 
         if (id) {
           const m = members.find(x => x.id === id);
-          m.name = name; m.whatsapp = whatsapp; m.fee = fee; m.joiningDate = joiningDate;
+          m.name = name; m.whatsapp = whatsapp; m.joiningDate = joiningDate;
+          m.gymFee = gymFee; m.treadmillFee = treadmillFee; m.hasTreadmill = hasTreadmill;
+          m.billingMonths = billingMonths;
+          m.fee = monthlyFee(m);
+          // Only touch nextDueDate when no payment history depends on it.
+          if (!(m.payments || []).length) m.nextDueDate = nextDueDate;
           toast("Member updated");
         } else {
-          members.push({
-            id: uid(), name, whatsapp, fee, joiningDate,
-            nextDueDate: joiningDate,
+          const m = {
+            id: uid(), name, whatsapp,
+            gymFee, treadmillFee, hasTreadmill, billingMonths,
+            fee: 0,
+            joiningDate,
+            nextDueDate,
             status: "active",
             payments: []
-          });
+          };
+          m.fee = monthlyFee(m);
+          members.push(m);
           toast("Member added");
         }
         saveMembers(members);
@@ -2936,10 +3071,16 @@
 
         document.getElementById("mdDueDate").textContent = fmtDate(m.nextDueDate);
         const diff = daysDiff(m.nextDueDate);
-        document.getElementById("mdDueAmount").textContent = fmtMoney(m.fee) + (diff < 0 ? ` · ${Math.abs(diff)} day(s) overdue` : diff === 0 ? " · due today" : ` · in ${diff} day(s)`);
+        document.getElementById("mdDueAmount").textContent = fmtMoney(periodFee(m)) + (diff < 0 ? ` · ${Math.abs(diff)} day(s) overdue` : diff === 0 ? " · due today" : ` · in ${diff} day(s)`);
 
-        document.getElementById("mdFee").textContent = fmtMoney(m.fee) + "/mo";
-        document.getElementById("mdJoiningDate").textContent = fmtDate(m.joiningDate);
+        // Fee tile shows the amount per bill plus the breakdown behind it.
+        const breakdown = m.hasTreadmill
+          ? `${fmtMoney(m.gymFee)} gym + ${fmtMoney(m.treadmillFee)} treadmill`
+          : `${fmtMoney(m.gymFee)} gym`;
+        document.getElementById("mdFee").innerHTML =
+          `${fmtMoney(periodFee(m))}${cycleSuffix(m)}<div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:2px;">${breakdown}${cycleMonths(m) === 3 ? " × 3 months" : ""}</div>`;
+        document.getElementById("mdJoiningDate").innerHTML =
+          `${fmtDate(m.joiningDate)}<div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:2px;">${planLabel(m)}</div>`;
 
         const hist = (m.payments || []).slice().sort((a, b) => b.paidOn.localeCompare(a.paidOn));
         const mostRecent = mostRecentlyRecordedPayment(m);
@@ -2948,21 +3089,25 @@
         if (hist.length === 0) { histWrap.innerHTML = ""; histEmpty.style.display = "block"; }
         else {
           histEmpty.style.display = "none";
+          // Every past payment is tappable to pull up its receipt. Only the
+          // most recently RECORDED payment can be edited or removed —
+          // editing an older one can't be undone safely without recomputing
+          // every payment that came after it.
           histWrap.innerHTML = `<div class="field__hint" style="margin:-4px 0 10px;">Tap any payment to view or send its receipt. Only the most recent payment can be edited or removed.</div>` + hist.map(p => {
             const isMostRecent = mostRecent && p.id === mostRecent.id;
             return `
-          <div class="timeline-item">
-            <div class="timeline-item__dot" data-payment-id="${p.id}" style="cursor:pointer;">${CHECK_SVG}</div>
-            <div style="flex:1;cursor:pointer;" data-payment-id="${p.id}">
-              <div class="timeline-item__title">Payment received${isMostRecent ? '<span class="latest-payment-badge">Latest</span>' : ''}</div>
-              <div class="timeline-item__meta">${fmtDate(p.paidOn)} · Receipt #${p.receiptNo}</div>
-            </div>
-            <div class="timeline-item__amount" data-payment-id="${p.id}" style="cursor:pointer;">${fmtMoney(p.amount)}</div>
-            ${isMostRecent ? `<div class="timeline-item__actions">
-              <button class="timeline-item__iconbtn" data-edit-payment-id="${p.id}" aria-label="Edit payment">${EDIT_SVG}</button>
-              <button class="timeline-item__iconbtn timeline-item__iconbtn--danger" data-delete-payment-id="${p.id}" aria-label="Remove payment">${TRASH_SVG}</button>
-            </div>` : ''}
-          </div>`;
+      <div class="timeline-item">
+        <div class="timeline-item__dot" data-payment-id="${p.id}" style="cursor:pointer;">${CHECK_SVG}</div>
+        <div style="flex:1;cursor:pointer;" data-payment-id="${p.id}">
+          <div class="timeline-item__title">Payment received${isMostRecent ? '<span class="latest-payment-badge">Latest</span>' : ''}</div>
+          <div class="timeline-item__meta">${fmtDate(p.paidOn)} · Receipt #${p.receiptNo}${p.planLabel ? " · " + escapeHtml(p.planLabel) : ""}</div>
+        </div>
+        <div class="timeline-item__amount" data-payment-id="${p.id}" style="cursor:pointer;">${fmtMoney(p.amount)}</div>
+        ${isMostRecent ? `<div class="timeline-item__actions">
+          <button class="timeline-item__iconbtn" data-edit-payment-id="${p.id}" aria-label="Edit payment">${EDIT_SVG}</button>
+          <button class="timeline-item__iconbtn timeline-item__iconbtn--danger" data-delete-payment-id="${p.id}" aria-label="Remove payment">${TRASH_SVG}</button>
+        </div>` : ''}
+      </div>`;
           }).join("");
           histWrap.querySelectorAll("[data-payment-id]").forEach(el => {
             el.addEventListener("click", () => {
@@ -3008,135 +3153,39 @@
 
       /* ===================================================================
          MARK PAID  /  EDIT PAYMENT  /  DELETE PAYMENT
-         ===================================================================
-         Flow (matches the diagram exactly):
- 
-           Click "Mark Paid"
-                 ↓
-           Find member
-                 ↓
-           Read current m.nextDueDate
-                 ↓
-           Copy it into temporary draft state   →  markPaidDraft = {...}
-                 ↓
-           computeBillingPeriod()
-                 ↓
-           Fill preview form
-                 ↓
-           ┌─────────────────────┐
-           │                     │
-         Cancel              Confirm
-           │                     │
-           ↓                     ↓
-         Discard draft      Create payment
-         (markPaidDraft        ↓
-          = null, via       Update m.nextDueDate
-          closeSheets)          ↓
-                            Save localStorage
- 
-         Nothing in this block ever writes to `m` until Confirm is
-         pressed. markPaidDraft is the ONLY place the "baseDueDate" is
-         held while the sheet is open — the member object itself is
-         never touched in the meantime, so Cancel (or the sheet being
-         dismissed any other way) can never cause a due date to
-         advance, however many times it's opened/closed.
          =================================================================== */
       let editingPaymentId = null;
       let pendingDeletePaymentId = null;
-      let markPaidDraft = null; // { memberId, baseDueDate, mode: "new" | "edit", paymentId? }
 
-      function refreshMarkPaidPreview(baseDueDateISO) {
-        console.log("🟡 [BILLING DEBUG] refreshMarkPaidPreview INPUT", {
-          baseDueDateISO,
-          activeMemberId,
-          memberNextDueDate: activeMemberId ? members.find(x => x.id === activeMemberId)?.nextDueDate : null
-        });
-
-        const { periodStart, periodEnd, nextDueDate } = computeBillingPeriod(baseDueDateISO);
-
-        console.log("🟡 [BILLING DEBUG] refreshMarkPaidPreview CALCULATED", {
-          periodStart,
-          periodEnd,
-          nextDueDate
-        });
-
+      // Recompute period/next-due preview from a fixed BASE due date and the
+      // member's cycle length. Deliberately does NOT depend on "Paid on".
+      function refreshMarkPaidPreview(baseDueDateISO, months) {
+        const { periodStart, periodEnd, nextDueDate } = computeBillingPeriod(baseDueDateISO, months);
         document.getElementById("smpPeriodStart").value = periodStart;
         document.getElementById("smpPeriodEnd").value = periodEnd;
         document.getElementById("smpNextDueDate").value = nextDueDate;
-
-        const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-        console.log("🟡 [BILLING DEBUG] refreshMarkPaidPreview OUTPUT", {
-          memberNextDueDate: m?.nextDueDate ?? null,
-          domNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
-        });
       }
 
       document.getElementById("mdMarkPaid").addEventListener("click", () => {
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
-
-        console.group("🔵 [BILLING DEBUG] MARK PAID CLICK");
-        const clickStartNextDueDate = m.nextDueDate;
-        console.log("MEMBER BEFORE opening Mark Paid preview", {
-          id: m.id,
-          name: m.name,
-          joiningDate: m.joiningDate,
-          nextDueDate: m.nextDueDate,
-          paymentsCount: (m.payments || []).length,
-          payments: JSON.parse(JSON.stringify(m.payments || [])),
-          existingDraft: markPaidDraft ? { ...markPaidDraft } : null
-        });
-        console.trace("TRACE: mdMarkPaid CLICK");
-
         editingPaymentId = null;
-        markPaidDraft = {
-          memberId: m.id,
-          baseDueDate: m.nextDueDate, // snapshot only — m itself is untouched
-          mode: "new"
-        };
-
-        document.getElementById("smpConfirmBtn").disabled = false;
-
         document.getElementById("smpTitle").textContent = "Confirm payment";
-        document.getElementById("smpDesc").textContent = `Mark ${m.name}'s fee as paid for the period ending ${fmtDate(m.nextDueDate)}?`;
-        document.getElementById("smpAmount").value = m.fee;
+        const months = cycleMonths(m);
+        document.getElementById("smpDesc").textContent =
+          `Mark ${m.name}'s ${months === 3 ? "quarterly" : "monthly"} fee as paid — ${planLabel(m)}, ${fmtMoney(periodFee(m))} for the ${months === 3 ? "3 months" : "month"} starting ${fmtDate(m.nextDueDate)}.`;
+        // Amount prefills to the full cycle charge: gym + treadmill, times
+        // 3 for a quarterly member. Still editable for part payments.
+        document.getElementById("smpAmount").value = periodFee(m);
         document.getElementById("smpPaidOnHint").textContent = "Paid on is just a record of when the money arrived — it doesn't affect the period or next due date below. Those follow the billing cycle, so late payments don't shift it.";
+
         document.getElementById("smpPaidOn").value = todayISO();
-
-        refreshMarkPaidPreview(markPaidDraft.baseDueDate);
-
-        console.log("PREVIEW AFTER refreshMarkPaidPreview()", {
-          baseDueDate: markPaidDraft.baseDueDate,
-          periodStart: document.getElementById("smpPeriodStart").value,
-          periodEnd: document.getElementById("smpPeriodEnd").value,
-          previewNextDueDate: document.getElementById("smpNextDueDate").value
-        });
-
-        console.log("MEMBER AFTER preview calculation", {
-          joiningDate: m.joiningDate,
-          nextDueDate: m.nextDueDate,
-          paymentsCount: (m.payments || []).length
-        });
-
-        if (m.nextDueDate !== clickStartNextDueDate) {
-          console.error("🔥🔥 DATE CHANGED DURING Mark Paid OPEN!", {
-            before: clickStartNextDueDate,
-            after: m.nextDueDate
-          });
-          console.trace("🔥 TRACE: Mark Paid opening changed date");
-        } else {
-          console.log("✅ Mark Paid opening DID NOT change member.nextDueDate");
-        }
+        refreshMarkPaidPreview(m.nextDueDate, months);
 
         openSheet("sheetMarkPaid");
-
-        console.log("MEMBER AFTER opening preview", {
-          joiningDate: m.joiningDate,
-          nextDueDate: m.nextDueDate,
-          paymentsCount: (m.payments || []).length
-        });
-        console.groupEnd();
       });
 
+      // Correct a mistake on the latest payment in place instead of stacking
+      // a second, incorrect payment on top.
       function openEditPayment(memberId, paymentId) {
         const m = members.find(x => x.id === memberId); if (!m) return;
         const p = (m.payments || []).find(x => x.id === paymentId); if (!p) return;
@@ -3146,15 +3195,6 @@
           return;
         }
         editingPaymentId = paymentId;
-        markPaidDraft = {
-          memberId: m.id,
-          baseDueDate: dueDateBeforeMostRecentPayment(m),
-          mode: "edit",
-          paymentId
-        };
-
-        document.getElementById("smpConfirmBtn").disabled = false;
-
         document.getElementById("smpTitle").textContent = "Edit payment";
         document.getElementById("smpDesc").textContent = `Editing ${m.name}'s payment recorded on ${fmtDate(p.paidOn)} (Receipt #${p.receiptNo}).`;
         document.getElementById("smpAmount").value = p.amount;
@@ -3166,36 +3206,19 @@
         openSheet("sheetMarkPaid");
       }
 
-      document.getElementById("smpPaidOn").addEventListener("change", () => { /* intentionally no-op */ });
+      // "Paid on" is a record of WHEN money arrived, not WHAT it's for, so
+      // it must never silently recalculate period/next-due-date.
+      document.getElementById("smpPaidOn").addEventListener("change", () => { /* intentionally no-op: see comment above */ });
 
+      // Editing "period end" keeps the next-due-date field in sync by
+      // default (still fully overridable afterwards).
       document.getElementById("smpPeriodEnd").addEventListener("change", () => {
         const pe = document.getElementById("smpPeriodEnd").value;
-        const m = activeMemberId ? members.find(x => x.id === activeMemberId) : null;
-        console.log("🟠 [BILLING DEBUG] PERIOD END CHANGE", {
-          periodEnd: pe,
-          beforeMemberNextDueDate: m?.nextDueDate ?? null,
-          beforeDomNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
-        });
-        if (isValidISODate(pe)) {
-          document.getElementById("smpNextDueDate").value = addDaysISO(pe, 1);
-        }
-        console.log("🟠 [BILLING DEBUG] PERIOD END CHANGE AFTER", {
-          afterMemberNextDueDate: m?.nextDueDate ?? null,
-          afterDomNextDueDate: document.getElementById("smpNextDueDate")?.value ?? null
-        });
+        if (isValidISODate(pe)) document.getElementById("smpNextDueDate").value = addDaysISO(pe, 1);
       });
 
       document.getElementById("smpConfirmBtn").addEventListener("click", () => {
-        const confirmBtn = document.getElementById("smpConfirmBtn");
-        if (confirmBtn.disabled) return;
-
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
-        if (!markPaidDraft || markPaidDraft.memberId !== m.id) {
-          toast("Session expired — please reopen Mark Paid", "error");
-          closeSheets();
-          return;
-        }
-
         const amountRaw = document.getElementById("smpAmount").value;
         const amount = Number(amountRaw);
         const paidOn = document.getElementById("smpPaidOn").value;
@@ -3203,6 +3226,7 @@
         const periodEnd = document.getElementById("smpPeriodEnd").value;
         const nextDueDate = document.getElementById("smpNextDueDate").value;
 
+        // --- validation ---
         if (!amountRaw || isNaN(amount) || amount <= 0) {
           toast("Enter a valid payment amount", "error"); return;
         }
@@ -3221,18 +3245,16 @@
         if (nextDueDate <= periodEnd) {
           toast("Next due date must be after period end", "error"); return;
         }
+        // --- end validation ---
 
-        confirmBtn.disabled = true;
-
-        if (markPaidDraft.mode === "edit") {
-          const p = (m.payments || []).find(x => x.id === markPaidDraft.paymentId);
-          if (!p) { toast("Payment not found", "error"); markPaidDraft = null; closeSheets(); return; }
+        if (editingPaymentId) {
+          // EDIT MODE: update in place, keeping the original receipt number
+          // — this is a correction, not a new transaction.
+          const p = (m.payments || []).find(x => x.id === editingPaymentId);
+          if (!p) { toast("Payment not found", "error"); closeSheets(); return; }
           p.amount = amount; p.paidOn = paidOn; p.periodStart = periodStart; p.periodEnd = periodEnd; p.nextDueDate = nextDueDate;
-          console.error("🔥 PAYMENT CONFIRM (EDIT) CHANGES NEXT DUE DATE", { member: m.name, oldNextDueDate: m.nextDueDate, newNextDueDate: nextDueDate });
-          console.trace("TRACE: PAYMENT CONFIRM EDIT");
           m.nextDueDate = nextDueDate;
           saveMembers(members);
-          markPaidDraft = null;
           closeSheets();
           toast("Payment updated");
           renderDashboard();
@@ -3240,17 +3262,26 @@
           return;
         }
 
+        // NEW PAYMENT
         settings.lastReceiptNo = (settings.lastReceiptNo || 0) + 1;
         saveSettings(settings);
         const receiptNo = "RCPT-" + String(settings.lastReceiptNo).padStart(4, "0");
 
-        const payment = { id: uid(), amount, paidOn, periodStart, periodEnd, nextDueDate, receiptNo };
+        // Snapshot the plan as it stood at payment time, so an old receipt
+        // still reads correctly after the member later switches plan or
+        // cycle.
+        const payment = {
+          id: uid(), amount, paidOn, periodStart, periodEnd, nextDueDate, receiptNo,
+          planLabel: planLabel(m),
+          months: cycleMonths(m),
+          gymFee: Number(m.gymFee || 0),
+          treadmillFee: m.hasTreadmill ? Number(m.treadmillFee || 0) : 0
+        };
         m.payments = m.payments || [];
         m.payments.push(payment);
         m.nextDueDate = nextDueDate;
         saveMembers(members);
 
-        markPaidDraft = null;
         closeSheets();
         document.getElementById("spsDesc").textContent = `Next due date is now ${fmtDate(m.nextDueDate)}.`;
         openSheet("sheetPaymentSuccess");
@@ -3263,6 +3294,8 @@
         if (lastPaymentForReceipt) openReceipt(lastPaymentForReceipt.member, lastPaymentForReceipt.payment);
       });
 
+      // Deleting the most recently recorded payment reverts the member's
+      // nextDueDate to whatever it was immediately before that payment.
       document.getElementById("confirmDeletePaymentBtn").addEventListener("click", () => {
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
         const mostRecent = mostRecentlyRecordedPayment(m);
@@ -3287,9 +3320,10 @@
       function buildReminderMessage(m) {
         return settings.template
           .replace(/{name}/g, m.name)
-          .replace(/{amount}/g, fmtMoney(m.fee))
+          .replace(/{amount}/g, fmtMoney(periodFee(m)))  // full cycle charge
           .replace(/{dueDate}/g, fmtDate(m.nextDueDate))
-          .replace(/{gymName}/g, settings.gymName || "");
+          .replace(/{gymName}/g, settings.gymName || "")
+          .replace(/{plan}/g, planLabel(m));
       }
       function waLink(phone, text) {
         return `https://wa.me/91${phone}?text=${encodeURIComponent(text)}`;
@@ -3314,7 +3348,7 @@
             return diff > 0 && diff <= REMINDER_ADVANCE_DAYS;
           });
         }
-        return active.filter(m => ["due", "overdue"].includes(memberStatus(m)));
+        return active.filter(m => ["due", "overdue"].includes(memberStatus(m))); // all unpaid
       }
       function reminderRowHtml(m) {
         const st = memberStatus(m);
@@ -3325,16 +3359,16 @@
         else { pillClass = "pill--due"; pillLabel = `Due in ${diff}d`; }
         const sentToday = m.lastReminderSentOn === todayISO();
         return `<div class="row" data-member-id="${m.id}">
-        <div class="row__avatar">${initials(m.name)}</div>
-        <div class="row__main">
-          <div class="row__name">${escapeHtml(m.name)}</div>
-          <div class="row__meta">Due ${fmtDate(m.nextDueDate)} · ${fmtMoney(m.fee)}</div>
-        </div>
-        <div class="row__side"><span class="pill ${pillClass}">${pillLabel}</span></div>
-        <button class="row-action-btn ${sentToday ? 'row-action-btn--sent' : 'row-action-btn--whatsapp'}" data-remind-id="${m.id}" aria-label="Send reminder">
-          ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
-        </button>
-      </div>`;
+    <div class="row__avatar">${initials(m.name)}</div>
+    <div class="row__main">
+      <div class="row__name">${escapeHtml(m.name)}</div>
+      <div class="row__meta">Due ${fmtDate(m.nextDueDate)} · ${fmtMoney(periodFee(m))} · ${m.hasTreadmill ? "Gym + Treadmill" : "Gym"}</div>
+    </div>
+    <div class="row__side"><span class="pill ${pillClass}">${pillLabel}</span></div>
+    <button class="row-action-btn ${sentToday ? 'row-action-btn--sent' : 'row-action-btn--whatsapp'}" data-remind-id="${m.id}" aria-label="Send reminder">
+      ${sentToday ? CHECK_SVG : WHATSAPP_SVG}
+    </button>
+    </div>`;
       }
       function renderReminders() {
         const active = members.filter(m => m.status !== "inactive");
@@ -3363,6 +3397,9 @@
         c.addEventListener("click", () => { reminderFilter = c.dataset.rfilter; renderReminders(); });
       });
 
+      // Sticky bottom "Send All" bar — shared between the Reminders tab and
+      // the Members tab. Only the queue belonging to the visible tab drives
+      // the bar.
       let sendAllBar = null;
       let sendAllQueue = [];
       function updateSendAllBar(count, queue, forView) {
@@ -3370,9 +3407,9 @@
           sendAllBar = document.createElement("div");
           sendAllBar.className = "bottom-action-bar";
           sendAllBar.innerHTML = `<button class="btn btn--whatsapp" id="sendAllBtn">
-          ${WHATSAPP_SVG}
-          Send All (<span id="sendAllCount">0</span>)
-        </button>`;
+      ${WHATSAPP_SVG}
+      Send All (<span id="sendAllCount">0</span>)
+    </button>`;
           document.body.appendChild(sendAllBar);
           document.getElementById("sendAllBtn").addEventListener("click", () => startBulkReminders(sendAllQueue));
         }
@@ -3405,11 +3442,11 @@
           : `${WHATSAPP_SVG} Open Next Chat (${escapeHtml(bulkQueue[bulkIndex]?.name || "")})`;
 
         document.getElementById("brQueue").innerHTML = bulkQueue.map((m, i) => `
-        <div class="row" style="${i < bulkIndex ? 'opacity:.5;' : ''}">
-          <div class="row__avatar">${initials(m.name)}</div>
-          <div class="row__main"><div class="row__name">${escapeHtml(m.name)}</div><div class="row__meta">+91 ${m.whatsapp}</div></div>
-          <div class="row__side"><span class="pill ${i < bulkIndex ? 'pill--paid' : 'pill--inactive'}">${i < bulkIndex ? 'Sent' : 'Pending'}</span></div>
-        </div>`).join("");
+    <div class="row" style="${i < bulkIndex ? 'opacity:.5;' : ''}">
+      <div class="row__avatar">${initials(m.name)}</div>
+      <div class="row__main"><div class="row__name">${escapeHtml(m.name)}</div><div class="row__meta">+91 ${m.whatsapp}</div></div>
+      <div class="row__side"><span class="pill ${i < bulkIndex ? 'pill--paid' : 'pill--inactive'}">${i < bulkIndex ? 'Sent' : 'Pending'}</span></div>
+    </div>`).join("");
       }
       document.getElementById("brSendNext").addEventListener("click", () => {
         if (bulkIndex >= bulkQueue.length) return;
@@ -3427,7 +3464,18 @@
       /* ===================================================================
          RECEIPT
          =================================================================== */
+      function receiptPlanText(member, payment) {
+        // Prefer the plan snapshot stored on the payment; fall back to the
+        // member's current plan for payments recorded before this existed.
+        return payment.planLabel || planLabel(member);
+      }
+      function receiptShareText(member, payment) {
+        const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
+        return `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nPlan: ${receiptPlanText(member, payment)}\nJoining Date: ${fmtDate(member.joiningDate)}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
+      }
       function openReceipt(m, payment) {
+        // Always re-fetch the live member record by id so the receipt can
+        // never show a stale name or joining date.
         const liveMember = members.find(x => x.id === m.id) || m;
         const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
 
@@ -3435,6 +3483,8 @@
         document.getElementById("rcAmount").textContent = fmtMoney(payment.amount);
         document.getElementById("rcNumber").textContent = payment.receiptNo;
         document.getElementById("rcMember").textContent = liveMember.name;
+        const planEl = document.getElementById("rcPlan");
+        if (planEl) planEl.textContent = receiptPlanText(liveMember, payment);
         document.getElementById("rcJoiningDate").textContent = fmtDate(liveMember.joiningDate);
         document.getElementById("rcDate").textContent = fmtDate(payment.paidOn);
         document.getElementById("rcPeriod").textContent = fmtDate(payment.periodStart) + " – " + fmtDate(payment.periodEnd);
@@ -3449,19 +3499,17 @@
       document.getElementById("rcShareWhatsapp").addEventListener("click", () => {
         if (!currentReceiptCtx) return;
         const { member, payment } = currentReceiptCtx;
-        const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
-        const text = `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nJoining Date: ${fmtDate(member.joiningDate)}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
-        window.open(waLink(member.whatsapp, text), "_blank");
+        window.open(waLink(member.whatsapp, receiptShareText(member, payment)), "_blank");
       });
+      // Native device share sheet (SMS, email, other apps) — no download
+      // needed. Shown only where the browser supports it.
       const rcShareAnyBtn = document.getElementById("rcShareAny");
       if (navigator.share) {
         rcShareAnyBtn.style.display = "flex";
         rcShareAnyBtn.addEventListener("click", async () => {
           if (!currentReceiptCtx) return;
           const { member, payment } = currentReceiptCtx;
-          const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
-          const text = `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nJoining Date: ${fmtDate(member.joiningDate)}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
-          try { await navigator.share({ title: "Payment Receipt", text }); } catch (e) { /* user cancelled — ignore */ }
+          try { await navigator.share({ title: "Payment Receipt", text: receiptShareText(member, payment) }); } catch (e) { /* user cancelled — ignore */ }
         });
       }
 
@@ -3474,6 +3522,8 @@
         document.getElementById("settingsBillingDesc").textContent = settings.billingRule === "fixedday"
           ? `Fixed day: everyone bills on day ${settings.billingFixedDay} of the month`
           : "Anniversary: each member's period follows their own due date";
+        const feesDesc = document.getElementById("settingsFeesDesc");
+        if (feesDesc) feesDesc.textContent = `Gym ${fmtMoney(settings.defaultGymFee)} · Treadmill ${fmtMoney(settings.defaultTreadmillFee)} per month`;
       }
       document.getElementById("settingsEditProfile").addEventListener("click", () => {
         document.getElementById("profileGymName").value = settings.gymName || "";
@@ -3501,6 +3551,28 @@
         saveSettings(settings); closeSheets(); toast("Message template saved");
       });
 
+      /* ------------ Default fees ------------ */
+      const settingsFeesBtn = document.getElementById("settingsEditFees");
+      if (settingsFeesBtn) {
+        settingsFeesBtn.addEventListener("click", () => {
+          document.getElementById("defGymFee").value = settings.defaultGymFee || "";
+          document.getElementById("defTreadmillFee").value = settings.defaultTreadmillFee || "";
+          openSheet("sheetDefaultFees");
+        });
+        document.getElementById("defaultFeesSaveBtn").addEventListener("click", () => {
+          const g = Number(document.getElementById("defGymFee").value);
+          const t = Number(document.getElementById("defTreadmillFee").value);
+          if (!g || g <= 0 || g > 1000000) { toast("Enter a valid gym fee", "error"); return; }
+          if (isNaN(t) || t < 0 || t > 1000000) { toast("Enter a valid treadmill fee", "error"); return; }
+          settings.defaultGymFee = g;
+          settings.defaultTreadmillFee = t;
+          saveSettings(settings);
+          closeSheets();
+          renderSettings();
+          toast("Default fees saved");
+        });
+      }
+
       /* ------------ Billing cycle rule ------------ */
       document.getElementById("settingsEditBilling").addEventListener("click", () => {
         document.querySelectorAll("#billingRuleSeg .segmented__opt").forEach(b => {
@@ -3517,7 +3589,7 @@
         document.getElementById("fixedDayField").style.display = rule === "fixedday" ? "block" : "none";
         document.getElementById("billingRuleHint").textContent = rule === "fixedday"
           ? "Fixed day: every period starts on the day you set below, regardless of when payment is made."
-          : "Anniversary: next period starts the day after the current due date, and runs one month from there (matches each member's own cycle).";
+          : "Anniversary: next period starts the day after the current due date, and runs one full cycle from there (matches each member's own cycle).";
       });
       document.getElementById("billingSaveBtn").addEventListener("click", () => {
         const activeBtn = document.querySelector("#billingRuleSeg .segmented__opt.active");
@@ -3556,8 +3628,13 @@
         if (document.getElementById("viewDashboard").classList.contains("active")) renderDashboard();
       }
       const importInput = document.getElementById("importFileInput");
-      document.getElementById("settingsImport").addEventListener("click", () => importInput.click());
-      document.getElementById("backupImportBtn").addEventListener("click", () => importInput.click());
+
+      // Import replaces everything, so it goes through a confirmation sheet
+      // first instead of firing the file picker straight away.
+      document.getElementById("settingsImport").addEventListener("click", () => openSheet("sheetConfirmImport"));
+      document.getElementById("backupImportBtn").addEventListener("click", () => openSheet("sheetConfirmImport"));
+      document.getElementById("confirmImportBtn").addEventListener("click", () => { closeSheets(); importInput.click(); });
+
       importInput.addEventListener("change", (e) => {
         const file = e.target.files[0]; if (!file) return;
         const reader = new FileReader();
@@ -3566,6 +3643,9 @@
             const data = JSON.parse(reader.result);
             if (!data || !Array.isArray(data.members)) throw new Error("Missing members array");
 
+            // Validate & sanitize each member instead of trusting the file
+            // blindly — a malformed backup could otherwise crash the app the
+            // first time a bad record is rendered.
             const cleanMembers = data.members.map((m, i) => {
               if (!m || typeof m.name !== "string" || !m.name.trim()) {
                 throw new Error(`Member #${i + 1} is missing a name`);
@@ -3574,10 +3654,15 @@
               if (!/^\d{10}$/.test(whatsapp)) {
                 throw new Error(`Member "${m.name}" has an invalid phone number`);
               }
-              const fee = Number(m.fee);
-              if (!fee || fee <= 0) {
+              // Older backups carry only a flat `fee`; newer ones carry the
+              // split gym/treadmill fields. Accept both.
+              const gymFee = Number(m.gymFee !== undefined ? m.gymFee : m.fee);
+              if (!gymFee || gymFee <= 0) {
                 throw new Error(`Member "${m.name}" has an invalid fee`);
               }
+              const treadmillFee = Math.max(0, Number(m.treadmillFee) || 0);
+              const hasTreadmill = !!m.hasTreadmill && treadmillFee > 0;
+              const billingMonths = Number(m.billingMonths) === 3 ? 3 : 1;
               const joiningDate = isValidISODate(m.joiningDate) ? m.joiningDate : todayISO();
               const nextDueDate = isValidISODate(m.nextDueDate) ? m.nextDueDate : joiningDate;
               const payments = Array.isArray(m.payments) ? m.payments.filter(p =>
@@ -3590,15 +3675,34 @@
                 periodStart: p.periodStart,
                 periodEnd: p.periodEnd,
                 nextDueDate: isValidISODate(p.nextDueDate) ? p.nextDueDate : addDaysISO(p.periodEnd, 1),
-                receiptNo: p.receiptNo || "RCPT-0000"
+                receiptNo: p.receiptNo || "RCPT-0000",
+                planLabel: typeof p.planLabel === "string" ? p.planLabel : undefined,
+                months: Number(p.months) === 3 ? 3 : (p.months === undefined ? undefined : 1),
+                gymFee: Number(p.gymFee) || undefined,
+                treadmillFee: Number(p.treadmillFee) || undefined
               })) : [];
-              return {
-                id: m.id || uid(), name: m.name.trim(), whatsapp, fee, joiningDate, nextDueDate,
+              const out = {
+                id: m.id || uid(), name: m.name.trim(), whatsapp,
+                gymFee, treadmillFee, hasTreadmill, billingMonths,
+                fee: 0,
+                joiningDate, nextDueDate,
                 status: m.status === "inactive" ? "inactive" : "active",
                 payments,
                 lastReminderSentOn: isValidISODate(m.lastReminderSentOn) ? m.lastReminderSentOn : null
               };
+              out.fee = monthlyFee(out);
+              return out;
             });
+
+            // Snapshot the data about to be overwritten. If the wrong backup
+            // was picked, today's data is recoverable from this device's
+            // storage under a timestamped key. Best-effort only.
+            try {
+              localStorage.setItem(
+                "gym_pre_import_snapshot_" + Date.now(),
+                JSON.stringify({ members, settings, savedAt: new Date().toISOString() })
+              );
+            } catch (snapErr) { /* best-effort safety net only */ }
 
             members = cleanMembers;
             if (data.settings && typeof data.settings === "object") {
@@ -3609,12 +3713,14 @@
                 template: typeof s.template === "string" && s.template.trim() ? s.template : settings.template,
                 lastReceiptNo: Number(s.lastReceiptNo) || settings.lastReceiptNo,
                 billingRule: ["anniversary", "fixedday"].includes(s.billingRule) ? s.billingRule : settings.billingRule,
-                billingFixedDay: Math.min(28, Math.max(1, Number(s.billingFixedDay) || settings.billingFixedDay))
+                billingFixedDay: Math.min(28, Math.max(1, Number(s.billingFixedDay) || settings.billingFixedDay)),
+                defaultGymFee: Number(s.defaultGymFee) > 0 ? Number(s.defaultGymFee) : settings.defaultGymFee,
+                defaultTreadmillFee: Number(s.defaultTreadmillFee) >= 0 && s.defaultTreadmillFee !== undefined ? Number(s.defaultTreadmillFee) : settings.defaultTreadmillFee
               });
             }
             saveMembers(members); saveSettings(settings);
             closeSheets();
-            toast("Backup imported");
+            toast("Backup imported. Your previous data was saved as a safety copy on this device just in case.");
             renderDashboard(); renderMembers(); renderSettings(); applyTheme();
           } catch (err) {
             toast("Invalid backup file: " + err.message, "error");
@@ -3661,14 +3767,6 @@
       });
 
       init();
-
-      // Initial state snapshot for the billing reproduction test.
-      setTimeout(() => {
-        console.log("================ BILLING DEBUG READY ================");
-        billingDebugState("INITIAL STATE");
-        console.log("TEST SEQUENCE: Mark Paid -> Cancel -> Mark Paid again. Do NOT Confirm.");
-        console.log("Expected: member.nextDueDate must stay unchanged after Cancel and on the second Mark Paid open.");
-      }, 0);
 
       /* ------------------------- PWA install / offline ------------------------- */
       if ("serviceWorker" in navigator) {
