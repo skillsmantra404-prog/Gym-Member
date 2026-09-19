@@ -1506,6 +1506,220 @@
       text-align: left;
     }
 
+    /* ===================================================================
+       v1.2 — FITNESS PROFILE, DIET PLAN, BODY PROGRESS, NEW JOINERS
+       All new classes are namespaced so nothing above is affected.
+       =================================================================== */
+    .badge-new {
+      display: inline-flex;
+      align-items: center;
+      font-size: 10.5px;
+      font-weight: 800;
+      background: var(--primary);
+      color: #fff;
+      border-radius: var(--radius-pill);
+      padding: 2px 8px;
+      margin-left: 6px;
+      flex-shrink: 0;
+    }
+
+    .goal-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      white-space: nowrap;
+    }
+
+    .goal-tag--muted {
+      background: var(--surface-alt);
+      color: var(--text-2);
+    }
+
+    .fitness-card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      padding: 15px 16px;
+      box-shadow: 0 1px 2px hsl(var(--shadow)/.06), 0 6px 16px hsl(var(--shadow)/.05);
+    }
+
+    .fitness-card__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 13px;
+    }
+
+    .meal-card {
+      background: var(--surface);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+      margin-bottom: 10px;
+      border-left: 3px solid var(--primary);
+    }
+
+    .meal-card__time {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .meal-card__body {
+      font-size: 13.5px;
+      line-height: 1.6;
+      margin-top: 5px;
+      color: var(--text);
+    }
+
+    .note-list {
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--text-2);
+    }
+
+    .note-list li {
+      position: relative;
+      padding-left: 18px;
+      margin-bottom: 9px;
+    }
+
+    .note-list li::before {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 8px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+    }
+
+    .disclaimer {
+      background: var(--due-bg);
+      color: var(--due);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+      font-size: 12.5px;
+      line-height: 1.6;
+      font-weight: 600;
+    }
+
+    .bf-hero {
+      text-align: center;
+      padding: 20px 16px;
+    }
+
+    .bf-hero__value {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1.05;
+    }
+
+    .bf-hero__label {
+      font-size: 12.5px;
+      color: var(--text-2);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .bf-hero__band {
+      font-size: 12.5px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    .delta {
+      font-size: 12.5px;
+      font-weight: 800;
+    }
+
+    .delta--good {
+      color: var(--paid);
+    }
+
+    .delta--watch {
+      color: var(--due);
+    }
+
+    .delta--flat {
+      color: var(--text-2);
+    }
+
+    .measure-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .measure-grid .field {
+      margin-bottom: 0;
+    }
+
+    .measure-grid .field--full {
+      grid-column: 1 / -1;
+    }
+
+    .measure-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      margin-bottom: 9px;
+    }
+
+    .measure-row__date {
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+
+    .measure-row__meta {
+      font-size: 12px;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+
+    .measure-row__bf {
+      font-size: 16px;
+      font-weight: 800;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+
+    .bf-preview {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      border-radius: var(--radius-md);
+      padding: 13px 15px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .joiner-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      margin-bottom: 10px;
+    }
+
+    .joiner-row__day {
+      font-size: 12.5px;
+      color: var(--text-2);
+      margin-top: 2px;
+    }
+
     @media(prefers-reduced-motion:reduce) {
 
       *,
@@ -1666,6 +1880,16 @@
             <button style="font-size:12.5px;font-weight:700;color:var(--text-2);" id="dashViewAll">View all</button>
           </div>
           <div id="dashAttention"></div>
+        </div>
+
+        <!-- v1.2: new joiners get their own slot, because the first month
+             decides whether they stay -->
+        <div class="section" id="dashNewJoinersSection" style="display:none;">
+          <div class="section__row">
+            <div class="section__title" style="margin-bottom:0;">Just Joined</div>
+            <span style="font-size:12px;color:var(--text-3);font-weight:600;">First 30 days</span>
+          </div>
+          <div id="dashNewJoiners"></div>
         </div>
       </section>
 
@@ -1858,7 +2082,7 @@
                 data</span><span class="list-item__desc">Permanently delete everything</span></span>
           </button>
         </div>
-        <div class="app-version">Gym Manager · Works fully offline · v1.1.0</div>
+        <div class="app-version">Gym Manager · Works fully offline · v1.2.0</div>
       </section>
     </main>
 
@@ -1930,7 +2154,8 @@
             <input id="mfWhatsapp" type="tel" inputmode="numeric" placeholder="98765 43210" maxlength="10" required>
           </div>
         </div>
-        <div class="field">
+        <!-- CHANGE: id added so this field can be hidden for discounted quarterly pricing -->
+        <div class="field" id="mfGymFeeField">
           <label class="field__label">Monthly gym fee</label>
           <div class="field__prefix-input">
             <span class="field__prefix">₹</span>
@@ -1959,6 +2184,21 @@
           </div>
           <div class="field__hint" id="mfTotalHint"></div>
         </div>
+
+        <!-- v1.2: quarterly members can be given a discounted 3-month price
+             instead of a straight monthly × 3 -->
+        <div class="field" id="mfQuarterlyField" style="display:none;">
+          <label class="field__label">Price for 3 months</label>
+          <div class="field__prefix-input">
+            <span class="field__prefix">₹</span>
+            <input id="mfQuarterlyTotal" type="number" inputmode="decimal" min="1" step="1">
+          </div>
+          <div class="field__hint" id="mfQuarterlyHint"></div>
+          <button type="button" id="mfQuarterlyReset"
+            style="font-size:12.5px;font-weight:700;color:var(--primary);margin-top:9px;padding:4px 2px;">Reset to full
+            price</button>
+        </div>
+
         <div class="field">
           <label class="field__label">Joining date</label>
           <input class="field__input" id="mfJoiningDate" type="date" required>
@@ -1999,7 +2239,8 @@
         <div style="font-size:19px;font-weight:800;" id="mdName">—</div>
         <div style="font-size:13px;color:var(--text-2);margin-top:2px;" id="mdPhone">—</div>
       </div>
-      <div style="display:flex;justify-content:center;margin-bottom:18px;"><span class="pill" id="mdStatusPill">—</span>
+      <div style="display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-bottom:18px;"><span class="pill"
+          id="mdStatusPill">—</span><span id="mdNewJoinerPill"></span>
       </div>
 
       <div class="card due-card">
@@ -2027,6 +2268,9 @@
         </button>
       </div>
 
+      <!-- v1.2: new joiner encouragement, shown only in the first 30 days -->
+      <div id="mdWelcomeBlock" style="display:none;margin-top:12px;"></div>
+
       <div class="section">
         <div class="section__title">Membership Info</div>
         <div class="info-grid">
@@ -2039,6 +2283,25 @@
             <div class="info-tile__value" id="mdJoiningDate">—</div>
           </div>
         </div>
+      </div>
+
+      <!-- v1.2: fitness profile + diet -->
+      <div class="section">
+        <div class="section__row">
+          <div class="section__title" style="margin-bottom:0;">Fitness & Diet</div>
+          <button style="font-size:12.5px;font-weight:700;color:var(--primary);" id="mdEditFitness">Edit</button>
+        </div>
+        <div id="mdFitnessCard"></div>
+      </div>
+
+      <!-- v1.2: body measurements + progress -->
+      <div class="section">
+        <div class="section__row">
+          <div class="section__title" style="margin-bottom:0;">Body Progress</div>
+          <button style="font-size:12.5px;font-weight:700;color:var(--primary);" id="mdAddMeasurement">Add
+            reading</button>
+        </div>
+        <div id="mdProgressCard"></div>
       </div>
 
       <div class="section">
@@ -2169,6 +2432,118 @@
       <div class="section">
         <div class="section__title">Queue</div>
         <div id="brQueue"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE: DIET PLAN (v1.2) =====================
+       Placed after Member Detail in the markup so it paints on top of it.
+       ================================================================= -->
+  <div class="page" id="pageDietPlan">
+    <div class="page__header">
+      <button class="back-btn" data-close-page><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6" />
+        </svg></button>
+      <div class="page__header-title">Diet Plan</div>
+      <button class="icon-btn" id="dpEditBtn" style="margin-left:auto;" aria-label="Edit plan">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+          stroke-linejoin="round">
+          <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+        </svg>
+      </button>
+    </div>
+    <div class="page__body">
+      <div id="dpHeader"></div>
+      <div id="dpViewMode">
+        <div id="dpMeals" style="margin-top:16px;"></div>
+        <div class="section">
+          <div class="section__title">Daily habits that matter</div>
+          <ul class="note-list" id="dpNotes"></ul>
+        </div>
+        <div class="section">
+          <div class="disclaimer" id="dpDisclaimer"></div>
+        </div>
+      </div>
+      <div id="dpEditMode" style="display:none;">
+        <div class="section" style="margin-top:16px;">
+          <div class="field__hint" style="margin-bottom:10px;">Edit the plan text freely below — add, remove or
+            change anything. This is exactly what gets sent on WhatsApp.</div>
+          <div class="field">
+            <textarea class="field__input" id="dpEditTextarea" style="height:360px !important;"></textarea>
+          </div>
+          <button type="button" id="dpResetBtn"
+            style="font-size:12.5px;font-weight:700;color:var(--primary);padding:4px 2px;">Reset to auto-generated
+            plan</button>
+        </div>
+      </div>
+    </div>
+    <div class="page__footer">
+      <div id="dpFooterView" class="btn-row">
+        <button class="btn btn--secondary" id="dpEditBtn2">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
+          Edit
+        </button>
+        <button class="btn btn--whatsapp" id="dpSendWhatsapp">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.1.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.5.1-.2 0-.4 0-.5C10 9 9.5 7.6 9.3 7c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.5-.3Z" />
+            <path
+              d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" />
+          </svg>
+          Send plan on WhatsApp
+        </button>
+      </div>
+      <div id="dpFooterEdit" class="btn-row" style="display:none;">
+        <button class="btn btn--secondary" id="dpCancelEditBtn">Cancel</button>
+        <button class="btn btn--primary" id="dpSaveEditBtn">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== PAGE: BODY PROGRESS (v1.2) ===================== -->
+  <div class="page" id="pageProgress">
+    <div class="page__header">
+      <button class="back-btn" data-close-page><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+          stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="m15 18-6-6 6-6" />
+        </svg></button>
+      <div class="page__header-title">Body Progress</div>
+    </div>
+    <div class="page__body">
+      <div id="pgHero"></div>
+      <div id="pgDeltas" style="margin-top:14px;"></div>
+      <div class="section">
+        <div class="section__title">All readings</div>
+        <div id="pgList"></div>
+      </div>
+      <div class="section">
+        <div class="disclaimer">Tape measurements give a general sense of change, not a lab result. Use the trend
+          over weeks to judge progress, not any single reading. For anything health-related, a doctor's assessment
+          comes first.</div>
+      </div>
+    </div>
+    <div class="page__footer">
+      <div class="btn-row">
+        <button class="btn btn--secondary" id="pgAddBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"
+            stroke-linejoin="round">
+            <path d="M12 5v14M5 12h14" />
+          </svg>
+          Add reading
+        </button>
+        <button class="btn btn--whatsapp" id="pgSendBtn">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M17.5 14.4c-.3-.1-1.7-.9-2-1-.3-.1-.5-.1-.6.1-.2.3-.7 1-.9 1.1-.1.2-.3.2-.6.1-.3-.1-1.2-.5-2.4-1.5-.9-.8-1.5-1.8-1.6-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.1.2-.3.2-.5.1-.2 0-.4 0-.5C10 9 9.5 7.6 9.3 7c-.2-.5-.4-.5-.6-.5h-.5c-.2 0-.5.1-.7.3-.2.3-1 1-1 2.4s1 2.8 1.1 3c.1.2 2 3.1 4.9 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.7-.7 2-1.4.2-.7.2-1.2.1-1.4-.1-.1-.3-.2-.5-.3Z" />
+            <path
+              d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5.1-1.3A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3 .8.8-2.9-.2-.3A8.2 8.2 0 1 1 12 20.2Z" />
+          </svg>
+          Send report
+        </button>
       </div>
     </div>
   </div>
@@ -2352,18 +2727,150 @@
       <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
           class="btn btn--danger" id="confirmDeletePaymentBtn">Remove</button></div>
     </div>
+
+    <!-- ============ v1.2 SHEETS ============ -->
+    <div class="sheet" id="sheetFitness" data-sheet>
+      <div class="sheet__handle"></div>
+      <div class="sheet__title">Fitness profile</div>
+      <div class="sheet__desc">Set the goal, food preference and monthly food budget to pick a diet plan. Height and
+        sex are only used for general body-progress context — leave them blank if you'd rather not record them.</div>
+      <div class="field">
+        <label class="field__label">Goal</label>
+        <div class="segmented" id="fitGoalSeg" style="margin:0;">
+          <button class="segmented__opt" data-goal="fat_loss">Fat loss</button>
+          <button class="segmented__opt" data-goal="muscle_gain">Muscle gain</button>
+          <!-- CHANGE 2A: new combined goal, existing goals untouched -->
+          <button class="segmented__opt" data-goal="recomp">Fat Loss + Muscle Gain</button>
+          <button class="segmented__opt" data-goal="maintenance">Stay fit</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label">Food preference</label>
+        <div class="segmented" id="fitDietSeg" style="margin:0;">
+          <button class="segmented__opt" data-diet="veg">Veg</button>
+          <button class="segmented__opt" data-diet="egg">Veg + Egg</button>
+          <button class="segmented__opt" data-diet="nonveg">Non-veg</button>
+        </div>
+      </div>
+      <!-- CHANGE 3: monthly food budget for the diet plan. Defaults to the
+           lowest tier so a plan can always be generated even if the owner
+           skips this field. -->
+      <div class="field">
+        <label class="field__label">Monthly food budget</label>
+        <div class="segmented" id="fitBudgetSeg" style="margin:0;">
+          <button class="segmented__opt active" data-budget="low">Low</button>
+          <button class="segmented__opt" data-budget="medium">Medium</button>
+          <button class="segmented__opt" data-budget="high">High</button>
+        </div>
+        <div class="field__hint" id="fitBudgetHint"></div>
+      </div>
+      <div class="field">
+        <label class="field__label">Sex (optional, for body-progress context)</label>
+        <div class="segmented" id="fitGenderSeg" style="margin:0;">
+          <button class="segmented__opt" data-gender="male">Male</button>
+          <button class="segmented__opt" data-gender="female">Female</button>
+        </div>
+      </div>
+      <!-- CHANGE 2B: Age field — used to personalize the diet/fitness notes -->
+      <div class="field">
+        <label class="field__label">Age (years)</label>
+        <input class="field__input" id="fitAge" type="number" inputmode="numeric" min="10" max="100" step="1"
+          placeholder="30">
+      </div>
+      <div class="field">
+        <label class="field__label">Height</label>
+        <div class="segmented" id="fitHeightUnitSeg" style="margin:0 0 10px;">
+          <button class="segmented__opt active" data-hunit="cm">Centimetres</button>
+          <button class="segmented__opt" data-hunit="in">Inches</button>
+        </div>
+        <div class="field__prefix-input"><input id="fitHeight" type="number" inputmode="decimal" min="1" step="0.1"
+            placeholder="170"><span class="field__prefix" id="fitHeightUnitLabel"
+            style="border-right:none;border-left:1.5px solid var(--border);">cm</span></div>
+        <div class="field__hint" id="fitHeightHint">Measure without shoes, standing straight against a wall.</div>
+      </div>
+      <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
+          class="btn btn--primary" id="fitSaveBtn">Save profile</button></div>
+    </div>
+
+    <div class="sheet" id="sheetMeasurement" data-sheet>
+      <div class="sheet__handle"></div>
+      <div class="sheet__title" id="msTitle">Add a reading</div>
+      <div class="sheet__desc">Measure with the tape flat against the skin — snug, not squeezing. Same time of day each
+        time gives the most comparable numbers.</div>
+
+      <div class="field">
+        <label class="field__label">Tape unit</label>
+        <div class="segmented" id="msUnitSeg" style="margin:0;">
+          <button class="segmented__opt active" data-munit="cm">Centimetres</button>
+          <button class="segmented__opt" data-munit="in">Inches</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field__label">Date of reading</label>
+        <input class="field__input" id="msDate" type="date">
+      </div>
+
+      <div class="measure-grid" style="margin-bottom:16px;">
+        <div class="field">
+          <label class="field__label">Neck <span id="msUnitNeck" style="color:var(--text-3);"></span></label>
+          <input class="field__input" id="msNeck" type="number" inputmode="decimal" min="1" step="0.1" placeholder="38">
+        </div>
+        <div class="field">
+          <label class="field__label">Waist <span id="msUnitWaist" style="color:var(--text-3);"></span></label>
+          <input class="field__input" id="msWaist" type="number" inputmode="decimal" min="1" step="0.1"
+            placeholder="86">
+        </div>
+        <!-- CHANGE 2C: Hip field removed — no longer needed or asked for -->
+        <div class="field">
+          <label class="field__label">Weight (kg)</label>
+          <input class="field__input" id="msWeight" type="number" inputmode="decimal" min="1" step="0.1"
+            placeholder="72">
+        </div>
+      </div>
+
+      <div class="field__hint" style="margin:-8px 2px 14px;" id="msWhereHint"></div>
+
+      <div class="field">
+        <label class="field__label">Note (optional)</label>
+        <input class="field__input" id="msNote" type="text" maxlength="80" placeholder="e.g. morning, before workout">
+      </div>
+
+      <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
+          class="btn btn--primary" id="msSaveBtn">Save reading</button></div>
+    </div>
+
+    <div class="sheet" id="sheetConfirmDeleteMeasurement" data-sheet>
+      <div class="sheet__handle"></div>
+      <div class="sheet__title">Remove this reading?</div>
+      <div class="sheet__desc">The measurement is deleted from this member's progress history. This can't be undone.
+      </div>
+      <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
+          class="btn btn--danger" id="confirmDeleteMeasurementBtn">Remove</button></div>
+    </div>
   </div>
 
   <script>
     /* =====================================================================
        GYM MANAGER — single-file app. Data stored in localStorage.
 
-       v1.1 adds:
+       v1.1 added:
          - Separate gym fee and treadmill fee. A member is either "Gym only"
            or "Gym + Treadmill"; the amount charged is the sum of the parts.
-         - Monthly or Quarterly payment cycle per member. A quarterly member
-           pays 3x the monthly total and their period/next-due-date advance
-           3 months instead of 1.
+         - Monthly or Quarterly payment cycle per member.
+
+       v1.2 adds:
+         - Custom quarterly price.
+         - Fitness profile per member: goal, food preference, sex, height, age.
+         - Goal-based Indian diet plans, sendable on WhatsApp individually,
+           now with a monthly food budget tier (Low/Medium/High — Low is the
+           default) and a free-text Edit so the owner can change anything
+           before sending.
+         - Body measurements with a tape (neck, waist, weight), tracked over
+           time WITHOUT any body-fat-percentage calculation — this version
+           deliberately does not estimate body fat from these numbers.
+         - "Just Joined" section and a motivation message for members in
+           their first 30 days.
        ===================================================================== */
     (function () {
       "use strict";
@@ -2375,6 +2882,8 @@
       // How many days before the due date a member shows up under the
       // Reminders tab's "Due Soon" chip.
       const REMINDER_ADVANCE_DAYS = 3;
+      // How long a member counts as "newly joined" for the motivation block.
+      const NEW_JOINER_DAYS = 30;
       let storageCorruptionDetected = false;
 
       function loadMembers() {
@@ -2441,24 +2950,44 @@
       if (settings.defaultTreadmillFee === undefined) settings.defaultTreadmillFee = 200;
 
       /* ------------------------- FEE / PLAN MODEL -------------------------
-         A member now stores:
-           gymFee        — monthly gym charge
-           treadmillFee  — monthly treadmill add-on charge (0 if unused)
-           hasTreadmill  — whether the add-on applies
-           billingMonths — 1 (monthly) or 3 (quarterly)
+         A member stores:
+           gymFee         — monthly gym charge
+           treadmillFee   — monthly treadmill add-on charge (0 if unused)
+           hasTreadmill   — whether the add-on applies
+           billingMonths  — 1 (monthly) or 3 (quarterly)
+           quarterlyTotal — OPTIONAL. When the member is quarterly and
+                            this is a positive number, it IS the amount they
+                            pay per quarter. This exists so a discount can be
+                            given for paying 3 months up front. When absent
+                            or zero, the amount falls back to monthly x 3 —
+                            which is exactly what every pre-v1.2 member does,
+                            so nothing about existing members changes.
          m.fee is kept in sync as the MONTHLY total purely for backward
          compatibility with older backups and any leftover reference.
          ----------------------------------------------------------------- */
       function monthlyFee(m) {
         return Number(m.gymFee || 0) + (m.hasTreadmill ? Number(m.treadmillFee || 0) : 0);
       }
-      // What the member actually pays each time a bill comes due — monthly
-      // total multiplied by the number of months in their cycle.
-      function periodFee(m) {
-        return monthlyFee(m) * cycleMonths(m);
-      }
       function cycleMonths(m) {
         return Number(m.billingMonths) === 3 ? 3 : 1;
+      }
+      // The list price for the cycle, before any quarterly discount.
+      function fullCycleFee(m) {
+        return monthlyFee(m) * cycleMonths(m);
+      }
+      // What the member actually pays each time a bill comes due.
+      function periodFee(m) {
+        if (cycleMonths(m) === 3) {
+          const custom = Number(m.quarterlyTotal);
+          if (custom > 0) return custom;
+        }
+        return fullCycleFee(m);
+      }
+      // Discount amount on a quarterly plan (0 when there is none).
+      function quarterlyDiscount(m) {
+        if (cycleMonths(m) !== 3) return 0;
+        const d = fullCycleFee(m) - periodFee(m);
+        return d > 0 ? d : 0;
       }
       function cycleLabel(m) {
         return cycleMonths(m) === 3 ? "Quarterly" : "Monthly";
@@ -2469,23 +2998,36 @@
       function planLabel(m) {
         return (m.hasTreadmill ? "Gym + Treadmill" : "Gym only") + " · " + cycleLabel(m);
       }
-      // Upgrade older member records in place. Anyone saved before this
-      // version has only a flat `fee`, which was always a monthly gym-only
-      // charge — so that becomes gymFee, with no treadmill and a monthly
-      // cycle. Existing due dates and payment history are untouched.
+      // Upgrade older member records in place. Anyone saved before v1.1 has
+      // only a flat `fee`, which was always a monthly gym-only charge — so
+      // that becomes gymFee, with no treadmill and a monthly cycle. v1.2
+      // fields all default to "unset", which reads identically to the old
+      // behaviour. Existing due dates and payment history are untouched.
       function migrateMember(m) {
         if (m.gymFee === undefined || m.gymFee === null) m.gymFee = Number(m.fee) || 0;
         if (m.treadmillFee === undefined || m.treadmillFee === null) m.treadmillFee = 0;
         if (m.hasTreadmill === undefined || m.hasTreadmill === null) m.hasTreadmill = false;
         if (m.billingMonths === undefined || m.billingMonths === null) m.billingMonths = 1;
+        if (m.quarterlyTotal === undefined || m.quarterlyTotal === null) m.quarterlyTotal = 0;
+        if (m.goal === undefined || m.goal === null) m.goal = "";
+        if (m.dietType === undefined || m.dietType === null) m.dietType = "";
+        // CHANGE 3: budget backfilled to the lowest tier for older records
+        if (m.budget === undefined || m.budget === null || !["low", "medium", "high"].includes(m.budget)) m.budget = "low";
+        if (m.gender === undefined || m.gender === null) m.gender = "";
+        // CHANGE 2B: age backfilled for members saved before this field existed
+        if (m.age === undefined || m.age === null) m.age = 0;
+        if (m.heightCm === undefined || m.heightCm === null) m.heightCm = 0;
+        if (!Array.isArray(m.measurements)) m.measurements = [];
+        // CHANGE (diet edit): free-text override of the generated plan
+        if (m.dietOverrideText === undefined || m.dietOverrideText === null) m.dietOverrideText = "";
         m.fee = monthlyFee(m);
         return m;
       }
       let migrationChanged = false;
       members.forEach(m => {
-        const before = JSON.stringify([m.gymFee, m.treadmillFee, m.hasTreadmill, m.billingMonths]);
+        const before = JSON.stringify([m.gymFee, m.treadmillFee, m.hasTreadmill, m.billingMonths, m.quarterlyTotal, m.goal, m.dietType, m.budget, m.gender, m.age, m.heightCm, m.measurements, m.dietOverrideText]);
         migrateMember(m);
-        if (JSON.stringify([m.gymFee, m.treadmillFee, m.hasTreadmill, m.billingMonths]) !== before) migrationChanged = true;
+        if (JSON.stringify([m.gymFee, m.treadmillFee, m.hasTreadmill, m.billingMonths, m.quarterlyTotal, m.goal, m.dietType, m.budget, m.gender, m.age, m.heightCm, m.measurements, m.dietOverrideText]) !== before) migrationChanged = true;
       });
       if (migrationChanged) saveMembers(members);
 
@@ -2528,6 +3070,11 @@
       function daysDiff(iso) { // due date minus today, in days
         const a = new Date(todayISO() + "T00:00:00");
         const b = new Date(iso + "T00:00:00");
+        return Math.round((b - a) / 86400000);
+      }
+      function daysBetween(fromISO, toISO) {
+        const a = new Date(fromISO + "T00:00:00");
+        const b = new Date(toISO + "T00:00:00");
         return Math.round((b - a) / 86400000);
       }
       function initials(name) {
@@ -2590,6 +3137,16 @@
         if (diff < 0) return "overdue";
         if (diff === 0) return "due";
         return "paid"; // paid up / upcoming
+      }
+
+      /* ---- v1.2: new joiner helpers ---- */
+      function daysSinceJoining(m) {
+        if (!isValidISODate(m.joiningDate)) return Infinity;
+        return daysBetween(m.joiningDate, todayISO());
+      }
+      function isNewJoiner(m) {
+        const d = daysSinceJoining(m);
+        return d >= 0 && d <= NEW_JOINER_DAYS && m.status !== "inactive";
       }
 
       /* ------------------------- TOAST ------------------------- */
@@ -2668,6 +3225,7 @@
         // mode, so a later "Mark Paid" tap never reuses stale edit state.
         editingPaymentId = null;
         pendingDeletePaymentId = null;
+        pendingDeleteMeasurementId = null;
       }
       overlay.addEventListener("click", (e) => { if (e.target === overlay) closeSheets(); });
       document.querySelectorAll("[data-close-sheet]").forEach(b => b.addEventListener("click", closeSheets));
@@ -2727,6 +3285,45 @@
           wrap.innerHTML = attention.map(memberRowHtml).join("");
           bindMemberRowClicks(wrap);
         }
+
+        renderNewJoiners();
+      }
+
+      /* ---- v1.2: Just Joined ---- */
+      function renderNewJoiners() {
+        const section = document.getElementById("dashNewJoinersSection");
+        const wrap = document.getElementById("dashNewJoiners");
+        const joiners = members
+          .filter(isNewJoiner)
+          .sort((a, b) => b.joiningDate.localeCompare(a.joiningDate))
+          .slice(0, 6);
+        if (joiners.length === 0) { section.style.display = "none"; wrap.innerHTML = ""; return; }
+        section.style.display = "block";
+        wrap.innerHTML = joiners.map(m => {
+          const d = daysSinceJoining(m);
+          const dayText = d === 0 ? "Joined today" : d === 1 ? "Day 2 of their journey" : `Day ${d + 1} of their journey`;
+          return `<div class="joiner-row" data-joiner-id="${m.id}">
+      <div class="row__avatar">${initials(m.name)}</div>
+      <div class="row__main">
+        <div class="row__name">${escapeHtml(m.name)}</div>
+        <div class="joiner-row__day">${dayText}</div>
+      </div>
+      <button class="row-action-btn row-action-btn--whatsapp" data-motivate-id="${m.id}" aria-label="Send encouragement">${WHATSAPP_SVG}</button>
+    </div>`;
+        }).join("");
+        wrap.querySelectorAll("[data-joiner-id]").forEach(row => {
+          row.addEventListener("click", (e) => {
+            if (e.target.closest(".row-action-btn")) return;
+            openMemberDetail(row.dataset.joinerId);
+          });
+        });
+        wrap.querySelectorAll("[data-motivate-id]").forEach(btn => {
+          btn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const m = members.find(x => x.id === btn.dataset.motivateId); if (!m) return;
+            window.open(waLink(m.whatsapp, buildWelcomeMessage(m)), "_blank");
+          });
+        });
       }
 
       /* ===================================================================
@@ -2781,13 +3378,14 @@
         const st = memberStatus(m);
         const pillClass = { due: "pill--due", overdue: "pill--overdue", paid: "pill--paid", inactive: "pill--inactive" }[st];
         const pillLabel = { due: "Due Today", overdue: "Overdue", paid: "Paid Up", inactive: "Inactive" }[st];
-        // Row meta now also carries the plan so gym-only vs gym+treadmill is
-        // visible at a glance without opening the member.
+        // Row meta carries the plan so gym-only vs gym+treadmill is visible
+        // at a glance without opening the member.
         const planBit = (m.hasTreadmill ? "Gym + Treadmill" : "Gym") + (cycleMonths(m) === 3 ? " · Quarterly" : "");
+        const newBadge = isNewJoiner(m) ? '<span class="badge-new">New</span>' : "";
         return `<div class="row" data-member-id="${m.id}">
     <div class="row__avatar">${initials(m.name)}</div>
     <div class="row__main">
-      <div class="row__name">${escapeHtml(m.name)}</div>
+      <div class="row__name">${escapeHtml(m.name)}${newBadge}</div>
       <div class="row__meta">${st === "inactive" ? "Inactive" : "Due " + fmtDate(m.nextDueDate)} · ${planBit}</div>
     </div>
     <div class="row__side">
@@ -2888,6 +3486,10 @@
       document.getElementById("mfNextDueDate").addEventListener("input", () => { mfNextDueManuallySet = true; });
 
       /* ---- plan / cycle controls on the member form ---- */
+      // Tracks whether the owner has typed their own quarterly price. Until
+      // they do, the field keeps mirroring monthly x 3 as fees change.
+      let mfQuarterlyManuallySet = false;
+
       function mfSelectedPlan() {
         const b = document.querySelector("#mfPlanSeg .segmented__opt.active");
         return b ? b.dataset.plan : "gym";
@@ -2896,27 +3498,72 @@
         const b = document.querySelector("#mfCycleSeg .segmented__opt.active");
         return b && b.dataset.months === "3" ? 3 : 1;
       }
+      // CHANGE: when Quarterly is selected, a single discounted quarterly
+      // price is being entered instead of a monthly breakdown, so the
+      // Monthly gym fee and Monthly treadmill fee fields are hidden. Their
+      // underlying values are NOT cleared — they stay exactly as they were
+      // (or as prefilled from defaults) so nothing about storage/calculation
+      // changes, they just aren't shown to the user while Quarterly is active.
+      function mfUpdateFeeVisibility() {
+        const isQuarterly = mfSelectedMonths() === 3;
+        const plan = mfSelectedPlan();
+        document.getElementById("mfGymFeeField").style.display = isQuarterly ? "none" : "block";
+        document.getElementById("mfTreadmillField").style.display = (!isQuarterly && plan === "gym_treadmill") ? "block" : "none";
+      }
       function mfSetPlan(plan) {
         document.querySelectorAll("#mfPlanSeg .segmented__opt").forEach(b => b.classList.toggle("active", b.dataset.plan === plan));
-        document.getElementById("mfTreadmillField").style.display = plan === "gym_treadmill" ? "block" : "none";
+        mfUpdateFeeVisibility(); // CHANGE: visibility now also depends on billing cycle
       }
       function mfSetMonths(months) {
         const val = Number(months) === 3 ? "3" : "1";
         document.querySelectorAll("#mfCycleSeg .segmented__opt").forEach(b => b.classList.toggle("active", b.dataset.months === val));
+        mfUpdateFeeVisibility(); // CHANGE: hide/show Gym + Treadmill fee fields based on cycle
+      }
+      function mfMonthlyTotal() {
+        const gym = Number(document.getElementById("mfFee").value) || 0;
+        const tread = mfSelectedPlan() === "gym_treadmill" ? (Number(document.getElementById("mfTreadmillFee").value) || 0) : 0;
+        return gym + tread;
       }
       // Live "what will actually be charged" line, so the total is never a
-      // surprise at Mark Paid time.
+      // surprise at Mark Paid time. Also drives the quarterly price field.
       function mfRefreshTotal() {
         const gym = Number(document.getElementById("mfFee").value) || 0;
         const tread = mfSelectedPlan() === "gym_treadmill" ? (Number(document.getElementById("mfTreadmillFee").value) || 0) : 0;
         const months = mfSelectedMonths();
         const monthly = gym + tread;
-        const total = monthly * months;
+        const full = monthly * months;
         const hint = document.getElementById("mfTotalHint");
-        if (!monthly) { hint.textContent = ""; return; }
-        hint.textContent = months === 3
-          ? `Charged ${fmtMoney(total)} every 3 months (${fmtMoney(gym)} gym${tread ? " + " + fmtMoney(tread) + " treadmill" : ""} = ${fmtMoney(monthly)}/month × 3).`
-          : `Charged ${fmtMoney(total)} every month (${fmtMoney(gym)} gym${tread ? " + " + fmtMoney(tread) + " treadmill" : ""}).`;
+        const qField = document.getElementById("mfQuarterlyField");
+        const qInput = document.getElementById("mfQuarterlyTotal");
+        const qHint = document.getElementById("mfQuarterlyHint");
+        const qReset = document.getElementById("mfQuarterlyReset");
+
+        // Show the quarterly price box only for quarterly members.
+        qField.style.display = months === 3 ? "block" : "none";
+        if (months === 3 && (!mfQuarterlyManuallySet || !qInput.value)) {
+          qInput.value = full > 0 ? full : "";
+        }
+
+        if (!monthly) { hint.textContent = ""; qHint.textContent = ""; return; }
+
+        if (months === 3) {
+          const entered = Number(qInput.value) || 0;
+          const charged = entered > 0 ? entered : full;
+          const saving = full - charged;
+          hint.textContent = `Full price would be ${fmtMoney(full)} — ${fmtMoney(gym)} gym${tread ? " + " + fmtMoney(tread) + " treadmill" : ""} = ${fmtMoney(monthly)}/month × 3.`;
+          qReset.textContent = `Reset to full price (${fmtMoney(full)})`;
+          if (saving > 0) {
+            const pct = Math.round((saving / full) * 100);
+            qHint.textContent = `Member pays ${fmtMoney(charged)} per quarter — a discount of ${fmtMoney(saving)} (${pct}% off). This is the amount used everywhere: reminders, Mark Paid and receipts.`;
+          } else if (saving < 0) {
+            qHint.textContent = `Member pays ${fmtMoney(charged)} per quarter, which is ${fmtMoney(-saving)} more than the monthly rate. Check this is what you intended.`;
+          } else {
+            qHint.textContent = `Member pays ${fmtMoney(charged)} per quarter — no discount. Lower this number to give one.`;
+          }
+        } else {
+          hint.textContent = `Charged ${fmtMoney(full)} every month (${fmtMoney(gym)} gym${tread ? " + " + fmtMoney(tread) + " treadmill" : ""}).`;
+          qHint.textContent = "";
+        }
       }
       document.getElementById("mfPlanSeg").addEventListener("click", (e) => {
         const btn = e.target.closest("[data-plan]"); if (!btn) return;
@@ -2934,6 +3581,19 @@
       });
       document.getElementById("mfFee").addEventListener("input", mfRefreshTotal);
       document.getElementById("mfTreadmillFee").addEventListener("input", mfRefreshTotal);
+      // CHANGE: Allow manual discounted quarterly pricing without changing existing membership functionality.
+      // Quarterly price auto-fills to monthly x 3, but once the owner types
+      // their own number here it is used as-is (no monthly x 3 enforcement)
+      // and is what gets saved, charged, reminded about and receipted.
+      document.getElementById("mfQuarterlyTotal").addEventListener("input", () => {
+        mfQuarterlyManuallySet = true;
+        mfRefreshTotal();
+      });
+      document.getElementById("mfQuarterlyReset").addEventListener("click", () => {
+        mfQuarterlyManuallySet = false;
+        document.getElementById("mfQuarterlyTotal").value = mfMonthlyTotal() * 3 || "";
+        mfRefreshTotal();
+      });
 
       function openAddMember() {
         memberForm.reset();
@@ -2941,6 +3601,8 @@
         document.getElementById("memberFormTitle").textContent = "Add Member";
         document.getElementById("mfFee").value = settings.defaultGymFee || "";
         document.getElementById("mfTreadmillFee").value = "";
+        document.getElementById("mfQuarterlyTotal").value = "";
+        mfQuarterlyManuallySet = false;
         mfSetPlan("gym");
         mfSetMonths(1);
         document.getElementById("mfJoiningDate").value = todayISO();
@@ -2960,6 +3622,12 @@
         document.getElementById("mfTreadmillFee").value = m.treadmillFee || "";
         mfSetPlan(m.hasTreadmill ? "gym_treadmill" : "gym");
         mfSetMonths(cycleMonths(m));
+        // A stored quarterly price counts as "manually set", so editing the
+        // gym fee doesn't quietly wipe a discount the owner agreed with the
+        // member. Reset is one tap away if they do want to recalculate.
+        const storedQ = Number(m.quarterlyTotal) || 0;
+        mfQuarterlyManuallySet = storedQ > 0;
+        document.getElementById("mfQuarterlyTotal").value = storedQ > 0 ? storedQ : "";
         document.getElementById("mfJoiningDate").value = m.joiningDate;
 
         // Due date is derived from payment history once payments exist, so
@@ -2992,6 +3660,7 @@
         const billingMonths = mfSelectedMonths();
         const joiningDate = document.getElementById("mfJoiningDate").value;
         const nextDueDate = document.getElementById("mfNextDueDate").value;
+        const quarterlyRaw = document.getElementById("mfQuarterlyTotal").value;
 
         // --- validation ---
         if (!name || name.length < 2) {
@@ -3005,6 +3674,13 @@
         }
         if (hasTreadmill && (isNaN(treadmillFee) || treadmillFee <= 0 || treadmillFee > 1000000)) {
           toast("Enter a valid treadmill fee, or switch the plan to Gym only", "error"); return;
+        }
+        let quarterlyTotal = 0;
+        if (billingMonths === 3) {
+          quarterlyTotal = Number(quarterlyRaw);
+          if (!quarterlyRaw || isNaN(quarterlyTotal) || quarterlyTotal <= 0 || quarterlyTotal > 5000000) {
+            toast("Enter a valid 3-month price", "error"); return;
+          }
         }
         if (!isValidISODate(joiningDate)) {
           toast("Please pick a valid joining date", "error"); return;
@@ -3029,6 +3705,7 @@
           m.name = name; m.whatsapp = whatsapp; m.joiningDate = joiningDate;
           m.gymFee = gymFee; m.treadmillFee = treadmillFee; m.hasTreadmill = hasTreadmill;
           m.billingMonths = billingMonths;
+          m.quarterlyTotal = billingMonths === 3 ? quarterlyTotal : 0;
           m.fee = monthlyFee(m);
           // Only touch nextDueDate when no payment history depends on it.
           if (!(m.payments || []).length) m.nextDueDate = nextDueDate;
@@ -3037,11 +3714,17 @@
           const m = {
             id: uid(), name, whatsapp,
             gymFee, treadmillFee, hasTreadmill, billingMonths,
+            quarterlyTotal: billingMonths === 3 ? quarterlyTotal : 0,
             fee: 0,
             joiningDate,
             nextDueDate,
             status: "active",
-            payments: []
+            payments: [],
+            // v1.2 fitness fields start empty — the owner fills them in from
+            // the member's own page when they're ready.
+            goal: "", dietType: "", budget: "low", gender: "", age: 0, heightCm: 0,
+            measurements: [],
+            dietOverrideText: ""
           };
           m.fee = monthlyFee(m);
           members.push(m);
@@ -3052,6 +3735,249 @@
         renderDashboard(); renderMembers();
         if (id) openMemberDetail(id);
       });
+
+      /* ===================================================================
+         v1.2 — DIET PLANS
+         Templates only. Nothing here is generated or personalised beyond
+         goal + food preference + budget, and every plan carries the same
+         disclaimer. The owner can always edit the final text freely (see
+         Diet Plan page "Edit").
+         =================================================================== */
+      // CHANGE 2A: new "recomp" goal added — existing goals unchanged
+      const DIET_GOALS = {
+        fat_loss: "Fat loss",
+        muscle_gain: "Muscle gain",
+        recomp: "Fat Loss + Muscle Gain",
+        maintenance: "Stay fit"
+      };
+      const DIET_TYPES = {
+        veg: "Vegetarian",
+        egg: "Veg + Egg",
+        nonveg: "Non-vegetarian"
+      };
+      // CHANGE 3: budget tiers for the diet plan. "low" is the default tier
+      // used whenever a member has not set one, so a plan can always be
+      // generated with the most economical ingredient choices.
+      const DIET_BUDGETS = {
+        low: "Low budget",
+        medium: "Medium budget",
+        high: "High budget"
+      };
+
+      const DIET_DISCLAIMER = "This is general guidance for healthy adults, not medical or dietetic advice. Anyone with a medical condition, who is pregnant or breastfeeding, on regular medication, or under 18 should speak to a doctor or a registered dietitian before changing how they eat.";
+
+      const DIET_BASE = {
+        fat_loss: {
+          headline: "Eat enough, move more. Nothing here starves you.",
+          meals: [
+            { key: "early", time: "Early morning · 6:30 AM", items: "1 glass warm water · 5–6 soaked almonds · 1 soaked walnut" },
+            { key: "breakfast", time: "Breakfast · 8:30 AM", items: "2 besan chilla with onion and tomato, or 1 bowl vegetable poha with peanuts · 1 small bowl curd" },
+            { key: "mid", time: "Mid-morning · 11:00 AM", items: "1 seasonal fruit — guava, papaya, apple or orange" },
+            { key: "lunch", time: "Lunch · 1:30 PM", items: "2 roti · 1 bowl dal · 1 bowl seasonal sabzi · large salad of cucumber, tomato and onion · 1 small bowl curd" },
+            { key: "evening", time: "Evening · 5:00 PM", items: "Tea or coffee with little sugar · 1 small bowl roasted chana or sprouts" },
+            { key: "dinner", time: "Dinner · 8:00 PM", items: "1–2 roti · paneer bhurji made with about 80g paneer, or mixed veg sabzi · salad" }
+          ],
+          notes: [
+            "Drink 3–4 litres of water through the day.",
+            "Add a 20–30 minute walk on top of the gym workout.",
+            "Cutting cold drinks, packet juice, fried snacks and sweets does about half the work on its own.",
+            "Do not skip meals. Eating too little slows results and costs muscle instead of fat.",
+            "Around 2–3 kg a month is a healthy pace, and it stays off. Faster than that usually comes back.",
+            "Sleep 7–8 hours. Short sleep makes hunger much harder to manage."
+          ]
+        },
+        muscle_gain: {
+          headline: "Eat often, lift heavier, sleep properly.",
+          meals: [
+            { key: "early", time: "Early morning · 6:30 AM", items: "1 glass milk · 8–10 soaked almonds · 2 dates" },
+            { key: "breakfast", time: "Breakfast · 8:30 AM", items: "1 bowl oats or daliya cooked in milk with 1 banana and 2 tsp peanut butter, or 3 stuffed paratha with curd" },
+            { key: "mid", time: "Mid-morning · 11:30 AM", items: "1 banana milkshake, or 1 bowl sprouts chaat" },
+            { key: "lunch", time: "Lunch · 1:30 PM", items: "3–4 roti · 1 large bowl dal, rajma or chole · 1 sabzi · 1 bowl rice · curd · salad" },
+            { key: "workout", time: "Around the workout", items: "1 banana before · 1 glass milk with 2 tsp peanut butter after" },
+            { key: "dinner", time: "Dinner · 8:30 PM", items: "3 roti · paneer sabzi with about 150g paneer · 1 bowl dal · salad" },
+            { key: "night", time: "Before bed", items: "1 glass warm milk with haldi" }
+          ],
+          notes: [
+            "Eat every 3 hours. Missed meals are the usual reason the weight doesn't move.",
+            "Aim for roughly 1.6–2 g of protein per kg of bodyweight, spread across the day.",
+            "Add a little weight or a rep to the main lifts each week — that progression is what builds muscle.",
+            "Sleep 7–8 hours. Muscle is built during rest, not during the session.",
+            "2–3 kg a month is a good pace. Faster than that is mostly fat.",
+            "Protein powder is optional. Milk, dal, paneer, eggs and chana do the same job at a fraction of the cost."
+          ]
+        },
+        // CHANGE 2A: new combined "recomp" (Fat Loss + Muscle Gain) plan —
+        // moderate protein-forward eating, close to maintenance calories,
+        // paired with strength training so fat comes down while muscle holds
+        // or slowly builds. Existing goals above are untouched.
+        recomp: {
+          headline: "Train hard, eat enough protein, let body composition shift slowly.",
+          meals: [
+            { key: "early", time: "Early morning · 6:30 AM", items: "1 glass warm water · 6–8 soaked almonds · 1 soaked walnut" },
+            { key: "breakfast", time: "Breakfast · 8:30 AM", items: "2–3 besan chilla or vegetable poha with peanuts · 1 bowl curd" },
+            { key: "mid", time: "Mid-morning · 11:00 AM", items: "1 seasonal fruit · a handful of roasted chana" },
+            { key: "lunch", time: "Lunch · 1:30 PM", items: "2–3 roti · 1 bowl dal or rajma · 1 sabzi · salad · 1 bowl curd" },
+            { key: "workout", time: "Around the workout", items: "1 banana before · 1 glass milk after" },
+            { key: "evening", time: "Evening · 5:00 PM", items: "Tea or coffee · roasted chana or sprouts" },
+            { key: "dinner", time: "Dinner · 8:00 PM", items: "2 roti · paneer bhurji with about 100g paneer, or mixed veg sabzi · salad" }
+          ],
+          notes: [
+            "Protein at every meal — this is what lets fat come down without losing muscle.",
+            "Strength train 3–4 times a week; keep adding a little weight or a rep where you can.",
+            "Eat close to your normal maintenance amount — not a big deficit or surplus.",
+            "Progress here is slower and shows more in the mirror and measurements than on the scale.",
+            "Sleep 7–8 hours — recovery is what actually lets the recomposition happen.",
+            "Expect this to take longer than a pure fat-loss or pure muscle-gain phase. That's normal."
+          ]
+        },
+        maintenance: {
+          headline: "Keep the habits simple enough to repeat for years.",
+          meals: [
+            { key: "early", time: "Early morning · 7:00 AM", items: "1 glass warm water with lemon · 5 soaked almonds" },
+            { key: "breakfast", time: "Breakfast · 8:30 AM", items: "1 bowl poha or upma, or 3 idli with sambar, or 2 paratha with curd" },
+            { key: "mid", time: "Mid-morning · 11:30 AM", items: "1 fruit · green tea" },
+            { key: "lunch", time: "Lunch · 1:30 PM", items: "2–3 roti · 1 bowl dal · 1 sabzi · curd · salad" },
+            { key: "evening", time: "Evening · 5:00 PM", items: "Tea · roasted chana, makhana or a handful of peanuts" },
+            { key: "dinner", time: "Dinner · 8:00 PM", items: "2 roti with sabzi, or khichdi with curd · salad" }
+          ],
+          notes: [
+            "Keep about 80% of meals simple home food. The rest can be whatever you enjoy.",
+            "Weigh yourself once a week, same day and same time — not daily.",
+            "Stay active on rest days with a walk, cycling or stretching.",
+            "Drink about 3 litres of water daily.",
+            "Protein at every meal — dal, curd, paneer, eggs or chicken — keeps you full and holds on to muscle."
+          ]
+        }
+      };
+
+      // Only the meals that actually change between food preferences are
+      // overridden; everything else comes from the base plan.
+      const DIET_SWAPS = {
+        fat_loss: {
+          egg: {
+            breakfast: "3 boiled eggs (keep one yolk) with 1 slice brown bread or 1 roti · 1 cup tea without sugar",
+            evening: "Tea or coffee with little sugar · 2 boiled egg whites or 1 small bowl roasted chana"
+          },
+          nonveg: {
+            breakfast: "2 egg omelette with vegetables · 1 roti · 1 cup tea without sugar",
+            lunch: "2 roti · 1 bowl chicken curry made with about 150g chicken and less oil (or dal on other days) · large salad · curd",
+            dinner: "Grilled chicken or fish, about 150g · 1 roti · salad"
+          }
+        },
+        muscle_gain: {
+          egg: {
+            breakfast: "4 whole eggs as omelette or boiled · 3 slices bread or 2 paratha · 1 glass milk",
+            mid: "2 boiled eggs · 1 banana"
+          },
+          nonveg: {
+            breakfast: "4 whole eggs as omelette or boiled · 3 slices bread or 2 paratha · 1 glass milk",
+            lunch: "3–4 roti · chicken curry with about 200g chicken · 1 bowl rice · curd · salad",
+            dinner: "Grilled chicken or fish, about 200g · 3 roti · 1 bowl dal · salad"
+          }
+        },
+        maintenance: {
+          egg: {
+            breakfast: "2 boiled eggs with 1 roti or 2 slices bread, or 1 bowl poha with a boiled egg"
+          },
+          nonveg: {
+            lunch: "2–3 roti · chicken curry with about 150g chicken, twice or thrice a week, dal on the other days · curd · salad",
+            dinner: "2 roti · grilled chicken or fish, about 150g, or sabzi · salad"
+          }
+        },
+        // CHANGE 2A: swaps for the new recomp goal
+        recomp: {
+          egg: {
+            breakfast: "3 eggs (1–2 whole, rest whites) with 1 roti or 2 slices bread · 1 bowl curd",
+            evening: "Tea or coffee · 2 boiled eggs or roasted chana"
+          },
+          nonveg: {
+            breakfast: "2 egg omelette with vegetables · 1 roti · 1 bowl curd",
+            lunch: "2–3 roti · chicken curry with about 150g chicken (or dal on other days) · salad · curd",
+            dinner: "Grilled chicken or fish, about 150g · 2 roti · salad"
+          }
+        }
+      };
+
+      // CHANGE 3: budget-tier swaps. These replace or trim the pricier
+      // items (paneer, dry fruits, chicken/fish, milk quantity) with
+      // cheaper equivalents for a Low budget, and add a couple of premium
+      // items for a High budget. Medium budget uses the base plan/food-type
+      // swap as-is. Applied on top of DIET_BASE + DIET_SWAPS.
+      const BUDGET_SWAPS = {
+        low: {
+          fat_loss: {
+            evening: "Tea or coffee with little sugar · 1 small bowl roasted chana (cheaper than nuts, similar protein)",
+            dinner: "1–2 roti · mixed veg sabzi or dal, use paneer only 2–3 times a week instead of daily · salad"
+          },
+          muscle_gain: {
+            early: "1 glass milk · a small handful of peanuts instead of almonds/walnuts · 2 dates",
+            dinner: "3 roti · chana or rajma sabzi instead of paneer on most days · 1 bowl dal · salad"
+          },
+          recomp: {
+            dinner: "2 roti · dal or chana sabzi, paneer only 2–3 times a week · salad"
+          },
+          maintenance: {
+            evening: "Tea · roasted chana or peanuts instead of makhana"
+          },
+          note: "Budget note: dry fruits, paneer, chicken and fish are the most expensive items here — this plan leans on dal, chana, peanuts, milk, curd and seasonal vegetables instead, which give similar protein and nutrition for much less money."
+        },
+        medium: {
+          note: ""
+        },
+        high: {
+          fat_loss: {
+            early: "1 glass warm water · 8–10 almonds · 2 walnuts · 2 soaked figs",
+            evening: "Tea or coffee · a handful of mixed nuts (almonds, walnuts, pistachios)"
+          },
+          muscle_gain: {
+            early: "1 glass milk with a scoop of protein powder (optional) · 10–12 almonds · 2 dates",
+            dinner: "3 roti · paneer or grilled chicken, about 180–200g · 1 bowl dal · salad"
+          },
+          recomp: {
+            early: "1 glass warm water · 8–10 almonds and walnuts mixed"
+          },
+          maintenance: {
+            evening: "Tea · a small handful of mixed nuts"
+          },
+          note: "Budget note: with more room in the budget, nuts, paneer and lean meats can feature a little more often — quality and variety go up, but the core meal structure stays the same."
+        }
+      };
+
+      function dietPlanFor(goal, dietType, budget) {
+        const base = DIET_BASE[goal];
+        if (!base) return null;
+        const swaps = (DIET_SWAPS[goal] && DIET_SWAPS[goal][dietType]) || {};
+        const budgetKey = ["low", "medium", "high"].includes(budget) ? budget : "low";
+        const budgetSwaps = (BUDGET_SWAPS[budgetKey] && BUDGET_SWAPS[budgetKey][goal]) || {};
+        const budgetNote = (BUDGET_SWAPS[budgetKey] && BUDGET_SWAPS[budgetKey].note) || "";
+        return {
+          headline: base.headline,
+          meals: base.meals.map(meal => ({
+            time: meal.time,
+            // Budget swap takes priority where one exists for this meal,
+            // then the food-preference swap, then the base item.
+            items: budgetSwaps[meal.key] || swaps[meal.key] || meal.items
+          })),
+          notes: budgetNote ? base.notes.concat([budgetNote]) : base.notes.slice()
+        };
+      }
+
+      /* ===================================================================
+         v1.2 — BODY MEASUREMENTS (tracking only)
+         NOTE: This app deliberately does NOT calculate or display any body
+         fat percentage. Neck, waist and weight are recorded purely to show
+         a simple trend over time (numbers going up/down), nothing more.
+         =================================================================== */
+      function toCm(value, unit) {
+        const n = Number(value);
+        if (!n || n <= 0) return 0;
+        return unit === "in" ? n * 2.54 : n;
+      }
+      function sortedMeasurements(m) {
+        return (m.measurements || []).slice().sort((a, b) => (a.date || "").localeCompare(b.date || ""));
+      }
+      function firstMeasurement(m) { const l = sortedMeasurements(m); return l[0] || null; }
+      function latestMeasurement(m) { const l = sortedMeasurements(m); return l[l.length - 1] || null; }
 
       /* ===================================================================
          MEMBER DETAIL
@@ -3069,18 +3995,40 @@
         const pill = document.getElementById("mdStatusPill");
         pill.className = "pill " + pillClass; pill.textContent = pillLabel;
 
+        // New joiner marker next to the status pill
+        const njPill = document.getElementById("mdNewJoinerPill");
+        njPill.innerHTML = isNewJoiner(m)
+          ? `<span class="goal-tag">Joined ${daysSinceJoining(m) === 0 ? "today" : daysSinceJoining(m) + " day" + (daysSinceJoining(m) === 1 ? "" : "s") + " ago"}</span>`
+          : "";
+
         document.getElementById("mdDueDate").textContent = fmtDate(m.nextDueDate);
         const diff = daysDiff(m.nextDueDate);
         document.getElementById("mdDueAmount").textContent = fmtMoney(periodFee(m)) + (diff < 0 ? ` · ${Math.abs(diff)} day(s) overdue` : diff === 0 ? " · due today" : ` · in ${diff} day(s)`);
 
         // Fee tile shows the amount per bill plus the breakdown behind it.
+        // When a quarterly member has a custom discounted price, the
+        // monthly gym/treadmill split is no longer meaningful (it doesn't
+        // match what they're actually charged), so it's hidden in favour of
+        // just the plan type + discount amount. Non-discounted quarterly
+        // members, and all monthly members, still show the full breakdown.
         const breakdown = m.hasTreadmill
           ? `${fmtMoney(m.gymFee)} gym + ${fmtMoney(m.treadmillFee)} treadmill`
           : `${fmtMoney(m.gymFee)} gym`;
+        const planTypeText = m.hasTreadmill ? "Gym + Treadmill" : "Gym only";
+        const discount = quarterlyDiscount(m);
+        const feeSub = cycleMonths(m) === 3
+          ? (discount > 0
+            ? `${planTypeText} · ${fmtMoney(discount)} quarterly discount applied`
+            : `${breakdown} = ${fmtMoney(monthlyFee(m))}/month × 3`)
+          : breakdown;
         document.getElementById("mdFee").innerHTML =
-          `${fmtMoney(periodFee(m))}${cycleSuffix(m)}<div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:2px;">${breakdown}${cycleMonths(m) === 3 ? " × 3 months" : ""}</div>`;
+          `${fmtMoney(periodFee(m))}${cycleSuffix(m)}<div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:2px;">${escapeHtml(feeSub)}</div>`;
         document.getElementById("mdJoiningDate").innerHTML =
           `${fmtDate(m.joiningDate)}<div style="font-size:11.5px;font-weight:600;color:var(--text-2);margin-top:2px;">${planLabel(m)}</div>`;
+
+        renderWelcomeBlock(m);
+        renderFitnessCard(m);
+        renderProgressCard(m);
 
         const hist = (m.payments || []).slice().sort((a, b) => b.paidOn.localeCompare(a.paidOn));
         const mostRecent = mostRecentlyRecordedPayment(m);
@@ -3132,6 +4080,124 @@
         openPage("pageMemberDetail");
       }
 
+      /* ---- v1.2: new joiner block on the member page ---- */
+      function renderWelcomeBlock(m) {
+        const box = document.getElementById("mdWelcomeBlock");
+        if (!isNewJoiner(m)) { box.style.display = "none"; box.innerHTML = ""; return; }
+        const d = daysSinceJoining(m);
+        const line = d <= 3
+          ? "Just started. The first week is about showing up, not about how much they lift."
+          : d <= 14
+            ? "Two weeks in — the hardest stretch. A message now makes a real difference to whether they stay."
+            : "Nearly a month in. Worth telling them how far they've come.";
+        box.style.display = "block";
+        box.innerHTML = `<div class="card" style="display:flex;align-items:center;gap:12px;">
+    <div class="list-item__icon" style="background:var(--primary-light);color:var(--primary-dark);flex-shrink:0;">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 15 9l7 .5-5.3 4.6 1.6 6.9L12 17.3 5.7 21l1.6-6.9L2 9.5 9 9Z"/></svg>
+    </div>
+    <div style="flex:1;">
+      <div style="font-size:13.5px;font-weight:700;">New member</div>
+      <div style="font-size:12px;color:var(--text-2);line-height:1.5;">${escapeHtml(line)}</div>
+    </div>
+    <button class="btn btn--whatsapp" style="width:auto;height:38px;padding:0 14px;flex-shrink:0;" id="mdWelcomeSendBtn">Send</button>
+  </div>`;
+        document.getElementById("mdWelcomeSendBtn").addEventListener("click", () => {
+          window.open(waLink(m.whatsapp, buildWelcomeMessage(m)), "_blank");
+        });
+      }
+
+      /* ---- v1.2: fitness & diet card ---- */
+      function renderFitnessCard(m) {
+        const wrap = document.getElementById("mdFitnessCard");
+        const hasGoal = !!DIET_GOALS[m.goal];
+        const hasDiet = !!DIET_TYPES[m.dietType];
+        if (!hasGoal || !hasDiet) {
+          wrap.innerHTML = `<div class="fitness-card">
+      <div style="font-size:13.5px;line-height:1.55;color:var(--text-2);">Set a goal, food preference and budget to give this member a diet plan you can send on WhatsApp.</div>
+      <button class="btn btn--secondary" style="margin-top:12px;" id="mdFitnessSetupBtn">Set goal, diet & budget</button>
+    </div>`;
+          document.getElementById("mdFitnessSetupBtn").addEventListener("click", openFitnessSheet);
+          return;
+        }
+        const heightTag = m.heightCm
+          ? `<span class="goal-tag goal-tag--muted">${Math.round(m.heightCm)} cm</span>` : "";
+        const genderTag = m.gender
+          ? `<span class="goal-tag goal-tag--muted">${m.gender === "female" ? "Female" : "Male"}</span>` : "";
+        const budgetTag = `<span class="goal-tag goal-tag--muted">${DIET_BUDGETS[m.budget] || DIET_BUDGETS.low}</span>`;
+        wrap.innerHTML = `<div class="fitness-card">
+    <div class="fitness-card__tags">
+      <span class="goal-tag">${DIET_GOALS[m.goal]}</span>
+      <span class="goal-tag">${DIET_TYPES[m.dietType]}</span>
+      ${budgetTag}${genderTag}${heightTag}
+    </div>
+    <div class="btn-row">
+      <button class="btn btn--secondary" id="mdViewDietBtn">View plan</button>
+      <button class="btn btn--whatsapp" id="mdSendDietBtn">Send plan</button>
+    </div>
+  </div>`;
+        document.getElementById("mdViewDietBtn").addEventListener("click", () => openDietPlan(m.id));
+        document.getElementById("mdSendDietBtn").addEventListener("click", () => sendDietPlan(m.id));
+      }
+
+      /* ---- v1.2: body progress card (no body-fat calculation) ---- */
+      function renderProgressCard(m) {
+        const wrap = document.getElementById("mdProgressCard");
+        const list = sortedMeasurements(m);
+        if (list.length === 0) {
+          wrap.innerHTML = `<div class="fitness-card">
+      <div style="font-size:13.5px;line-height:1.55;color:var(--text-2);">No readings yet. Take neck, waist and weight measurements to start tracking a simple trend over time.</div>
+      <button class="btn btn--secondary" style="margin-top:12px;" id="mdProgressStartBtn">Add first reading</button>
+    </div>`;
+          document.getElementById("mdProgressStartBtn").addEventListener("click", () => openMeasurementSheet(m.id));
+          return;
+        }
+        const first = list[0];
+        const last = list[list.length - 1];
+        let deltaHtml = "";
+        if (list.length > 1 && first.waistCm && last.waistCm) {
+          const d = Math.round((last.waistCm - first.waistCm) * 10) / 10;
+          deltaHtml = deltaLineHtml("Waist since first reading", d, " cm", m.goal);
+        }
+        const weightLine = last.weightKg
+          ? `<div>
+        <div style="font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.05;">${last.weightKg} kg</div>
+        <div style="font-size:12px;color:var(--text-2);font-weight:600;margin-top:3px;">Latest weight · ${fmtDate(last.date)}</div>
+      </div>`
+          : `<div>
+        <div style="font-size:15px;font-weight:700;">Last reading: ${fmtDate(last.date)}</div>
+      </div>`;
+        wrap.innerHTML = `<div class="fitness-card">
+    <div style="display:flex;align-items:flex-end;gap:12px;">
+      ${weightLine}
+    </div>
+    ${deltaHtml ? `<div style="margin-top:10px;">${deltaHtml}</div>` : ""}
+    <div style="font-size:12px;color:var(--text-2);margin-top:10px;">${list.length} reading${list.length === 1 ? "" : "s"} recorded</div>
+    <div class="btn-row" style="margin-top:12px;">
+      <button class="btn btn--secondary" id="mdViewProgressBtn">View progress</button>
+      <button class="btn btn--whatsapp" id="mdSendProgressBtn">Send report</button>
+    </div>
+  </div>`;
+        document.getElementById("mdViewProgressBtn").addEventListener("click", () => openProgressPage(m.id));
+        document.getElementById("mdSendProgressBtn").addEventListener("click", () => sendProgressReport(m.id));
+      }
+
+      // Renders a "-3.2cm since first reading" style line. Direction is
+      // judged against the member's goal, so a shrinking waist reads as
+      // good for a fat-loss member.
+      function deltaLineHtml(label, delta, unit, goal) {
+        let cls = "delta--flat";
+        if (delta !== 0) {
+          const wantsDown = true; // waist trend: smaller is generally the goal across all plans
+          const good = wantsDown ? delta < 0 : delta > 0;
+          cls = good ? "delta--good" : "delta--watch";
+        }
+        const sign = delta > 0 ? "+" : "";
+        return `<span style="font-size:12.5px;color:var(--text-2);font-weight:600;">${escapeHtml(label)}: </span><span class="delta ${cls}">${sign}${delta}${unit}</span>`;
+      }
+
+      document.getElementById("mdEditFitness").addEventListener("click", openFitnessSheet);
+      document.getElementById("mdAddMeasurement").addEventListener("click", () => openMeasurementSheet(activeMemberId));
+
       document.getElementById("mdMoreBtn").addEventListener("click", () => {
         const m = members.find(x => x.id === activeMemberId); if (!m) return;
         document.getElementById("smaTitle").textContent = m.name;
@@ -3171,10 +4237,13 @@
         editingPaymentId = null;
         document.getElementById("smpTitle").textContent = "Confirm payment";
         const months = cycleMonths(m);
+        const disc = quarterlyDiscount(m);
         document.getElementById("smpDesc").textContent =
-          `Mark ${m.name}'s ${months === 3 ? "quarterly" : "monthly"} fee as paid — ${planLabel(m)}, ${fmtMoney(periodFee(m))} for the ${months === 3 ? "3 months" : "month"} starting ${fmtDate(m.nextDueDate)}.`;
-        // Amount prefills to the full cycle charge: gym + treadmill, times
-        // 3 for a quarterly member. Still editable for part payments.
+          `Mark ${m.name}'s ${months === 3 ? "quarterly" : "monthly"} fee as paid — ${planLabel(m)}, ${fmtMoney(periodFee(m))} for the ${months === 3 ? "3 months" : "month"} starting ${fmtDate(m.nextDueDate)}${disc > 0 ? ` (includes a ${fmtMoney(disc)} quarterly discount)` : ""}.`;
+        // Amount prefills to what this member actually pays per cycle —
+        // their discounted quarterly price when one is set, otherwise the
+        // monthly total times the cycle length. Still editable for part
+        // payments.
         document.getElementById("smpAmount").value = periodFee(m);
         document.getElementById("smpPaidOnHint").textContent = "Paid on is just a record of when the money arrived — it doesn't affect the period or next due date below. Those follow the billing cycle, so late payments don't shift it.";
 
@@ -3275,7 +4344,8 @@
           planLabel: planLabel(m),
           months: cycleMonths(m),
           gymFee: Number(m.gymFee || 0),
-          treadmillFee: m.hasTreadmill ? Number(m.treadmillFee || 0) : 0
+          treadmillFee: m.hasTreadmill ? Number(m.treadmillFee || 0) : 0,
+          quarterlyTotal: cycleMonths(m) === 3 ? (Number(m.quarterlyTotal) || 0) : 0
         };
         m.payments = m.payments || [];
         m.payments.push(payment);
@@ -3315,15 +4385,590 @@
       });
 
       /* ===================================================================
+         v1.2 — FITNESS PROFILE SHEET
+         =================================================================== */
+      let fitHeightUnit = "cm";
+
+      function fitSelected(sel, attr) {
+        const b = document.querySelector(sel + " .segmented__opt.active");
+        return b ? b.dataset[attr] : "";
+      }
+      function fitSet(sel, attr, value) {
+        document.querySelectorAll(sel + " .segmented__opt").forEach(b => {
+          b.classList.toggle("active", value ? b.dataset[attr] === value : false);
+        });
+      }
+      function fitSetHeightUnit(unit) {
+        fitHeightUnit = unit === "in" ? "in" : "cm";
+        document.querySelectorAll("#fitHeightUnitSeg .segmented__opt").forEach(b => b.classList.toggle("active", b.dataset.hunit === fitHeightUnit));
+        document.getElementById("fitHeightUnitLabel").textContent = fitHeightUnit === "in" ? "in" : "cm";
+        document.getElementById("fitHeight").placeholder = fitHeightUnit === "in" ? "67" : "170";
+      }
+      document.getElementById("fitHeightUnitSeg").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-hunit]"); if (!btn) return;
+        const prev = fitHeightUnit;
+        const input = document.getElementById("fitHeight");
+        const val = Number(input.value);
+        fitSetHeightUnit(btn.dataset.hunit);
+        // Convert whatever is already typed rather than making the owner
+        // re-measure.
+        if (val > 0 && prev !== fitHeightUnit) {
+          const cm = prev === "in" ? val * 2.54 : val;
+          input.value = fitHeightUnit === "in" ? Math.round((cm / 2.54) * 10) / 10 : Math.round(cm * 10) / 10;
+        }
+      });
+      document.getElementById("fitGoalSeg").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-goal]"); if (!btn) return;
+        fitSet("#fitGoalSeg", "goal", btn.dataset.goal);
+      });
+      document.getElementById("fitDietSeg").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-diet]"); if (!btn) return;
+        fitSet("#fitDietSeg", "diet", btn.dataset.diet);
+      });
+      // CHANGE 3: budget segmented control
+      document.getElementById("fitBudgetSeg").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-budget]"); if (!btn) return;
+        fitSet("#fitBudgetSeg", "budget", btn.dataset.budget);
+        fitRefreshBudgetHint();
+      });
+      function fitRefreshBudgetHint() {
+        const budget = fitSelected("#fitBudgetSeg", "budget") || "low";
+        const hint = document.getElementById("fitBudgetHint");
+        if (budget === "low") hint.textContent = "Low budget (default): leans on dal, chana, peanuts, milk and curd instead of paneer, dry fruits and meat, to keep the plan affordable.";
+        else if (budget === "medium") hint.textContent = "Medium budget: the standard plan for this goal and food preference, no substitutions either way.";
+        else hint.textContent = "High budget: adds more nuts, paneer and lean meat where it fits the goal.";
+      }
+      document.getElementById("fitGenderSeg").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-gender]"); if (!btn) return;
+        fitSet("#fitGenderSeg", "gender", btn.dataset.gender);
+      });
+
+      function openFitnessSheet() {
+        const m = members.find(x => x.id === activeMemberId); if (!m) return;
+        fitSet("#fitGoalSeg", "goal", m.goal || "");
+        fitSet("#fitDietSeg", "diet", m.dietType || "");
+        // CHANGE 3: default to "low" budget whenever unset, per requirement
+        // that the lowest budget is auto-selected.
+        fitSet("#fitBudgetSeg", "budget", m.budget || "low");
+        fitRefreshBudgetHint();
+        fitSet("#fitGenderSeg", "gender", m.gender || "");
+        fitSetHeightUnit("cm");
+        document.getElementById("fitHeight").value = m.heightCm ? Math.round(m.heightCm * 10) / 10 : "";
+        // CHANGE 2B: populate age field
+        document.getElementById("fitAge").value = m.age ? m.age : "";
+        openSheet("sheetFitness");
+      }
+      document.getElementById("fitSaveBtn").addEventListener("click", () => {
+        const m = members.find(x => x.id === activeMemberId); if (!m) return;
+        const goal = fitSelected("#fitGoalSeg", "goal");
+        const dietType = fitSelected("#fitDietSeg", "diet");
+        // CHANGE 3: falls back to "low" if somehow nothing is selected,
+        // since Low is always the pre-selected default in this sheet.
+        const budget = fitSelected("#fitBudgetSeg", "budget") || "low";
+        const gender = fitSelected("#fitGenderSeg", "gender");
+        const heightRaw = Number(document.getElementById("fitHeight").value);
+        // CHANGE 2B: read age (optional — 0 means "not set")
+        const ageRaw = Number(document.getElementById("fitAge").value) || 0;
+
+        if (!goal) { toast("Pick a goal", "error"); return; }
+        if (!dietType) { toast("Pick a food preference", "error"); return; }
+        if (ageRaw && (ageRaw < 10 || ageRaw > 100)) {
+          toast("Enter a valid age", "error"); return;
+        }
+
+        let heightCm = 0;
+        if (heightRaw) {
+          heightCm = toCm(heightRaw, fitHeightUnit);
+          if (heightCm < 100 || heightCm > 250) {
+            toast("Height looks off — check the unit", "error"); return;
+          }
+          heightCm = Math.round(heightCm * 10) / 10;
+        }
+
+        const goalOrBudgetChanged = (m.goal !== goal) || (m.dietType !== dietType) || (m.budget !== budget);
+
+        m.goal = goal;
+        m.dietType = dietType;
+        m.budget = budget; // CHANGE 3
+        m.gender = gender || "";
+        m.age = ageRaw; // CHANGE 2B
+        m.heightCm = heightCm;
+
+        // If the goal, diet type or budget changed, any manually edited
+        // plan text is now stale (it describes the old profile), so it's
+        // cleared and the plan will regenerate fresh from the new profile.
+        if (goalOrBudgetChanged) m.dietOverrideText = "";
+
+        saveMembers(members);
+        closeSheets();
+        toast("Fitness profile saved");
+        openMemberDetail(activeMemberId);
+      });
+
+      /* ===================================================================
+         v1.2 — MEASUREMENT SHEET (tracking only, no body-fat calculation)
+         =================================================================== */
+      let measureUnit = "cm";
+      let editingMeasurementId = null;
+      let pendingDeleteMeasurementId = null;
+
+      function msUnitText() { return measureUnit === "in" ? "(in)" : "(cm)"; }
+      function msSetUnit(unit) {
+        const prev = measureUnit;
+        measureUnit = unit === "in" ? "in" : "cm";
+        document.querySelectorAll("#msUnitSeg .segmented__opt").forEach(b => b.classList.toggle("active", b.dataset.munit === measureUnit));
+        document.getElementById("msUnitNeck").textContent = msUnitText();
+        document.getElementById("msUnitWaist").textContent = msUnitText();
+        if (measureUnit === "in") {
+          document.getElementById("msNeck").placeholder = "15";
+          document.getElementById("msWaist").placeholder = "34";
+        } else {
+          document.getElementById("msNeck").placeholder = "38";
+          document.getElementById("msWaist").placeholder = "86";
+        }
+        // Convert anything already typed so switching units never silently
+        // reinterprets a number as the wrong measurement.
+        if (prev !== measureUnit) {
+          ["msNeck", "msWaist"].forEach(id => {
+            const input = document.getElementById(id);
+            const val = Number(input.value);
+            if (val > 0) {
+              const cm = prev === "in" ? val * 2.54 : val;
+              input.value = measureUnit === "in" ? Math.round((cm / 2.54) * 10) / 10 : Math.round(cm * 10) / 10;
+            }
+          });
+        }
+      }
+      document.getElementById("msUnitSeg").addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-munit]"); if (!btn) return;
+        msSetUnit(btn.dataset.munit);
+      });
+
+      function openMeasurementSheet(memberId, measurementId) {
+        const m = members.find(x => x.id === memberId); if (!m) return;
+        activeMemberId = memberId;
+        editingMeasurementId = measurementId || null;
+
+        document.getElementById("msWhereHint").textContent = "Neck: just below the Adam's apple. Waist: at the navel, relaxed, not sucked in.";
+
+        const existing = measurementId ? (m.measurements || []).find(r => r.id === measurementId) : null;
+        document.getElementById("msTitle").textContent = existing ? "Edit reading" : "Add a reading";
+
+        if (existing) {
+          msSetUnit(existing.unit || "cm");
+          document.getElementById("msDate").value = existing.date;
+          document.getElementById("msNeck").value = existing.neck || "";
+          document.getElementById("msWaist").value = existing.waist || "";
+          document.getElementById("msWeight").value = existing.weightKg || "";
+          document.getElementById("msNote").value = existing.note || "";
+        } else {
+          msSetUnit(measureUnit);
+          document.getElementById("msDate").value = todayISO();
+          document.getElementById("msNeck").value = "";
+          document.getElementById("msWaist").value = "";
+          document.getElementById("msWeight").value = "";
+          document.getElementById("msNote").value = "";
+        }
+        openSheet("sheetMeasurement");
+      }
+
+      document.getElementById("msSaveBtn").addEventListener("click", () => {
+        const m = members.find(x => x.id === activeMemberId); if (!m) return;
+        const date = document.getElementById("msDate").value;
+        const neck = Number(document.getElementById("msNeck").value) || 0;
+        const waist = Number(document.getElementById("msWaist").value) || 0;
+        const weightKg = Number(document.getElementById("msWeight").value) || 0;
+        const note = document.getElementById("msNote").value.trim();
+
+        if (!isValidISODate(date)) { toast("Pick a valid date", "error"); return; }
+        if (date > todayISO()) { toast("Reading date can't be in the future", "error"); return; }
+        if (!neck && !waist && !weightKg) {
+          toast("Enter at least one measurement", "error"); return;
+        }
+        const neckCm = toCm(neck, measureUnit);
+        const waistCm = toCm(waist, measureUnit);
+        // Sanity bounds catch a unit mix-up (34 cm waist, 86 inch waist)
+        // before it lands in the history and skews every later comparison.
+        if (neckCm && (neckCm < 20 || neckCm > 80)) { toast("Neck measurement looks off — check the unit", "error"); return; }
+        if (waistCm && (waistCm < 40 || waistCm > 200)) { toast("Waist measurement looks off — check the unit", "error"); return; }
+        if (weightKg && (weightKg < 25 || weightKg > 300)) { toast("Weight looks off — enter it in kg", "error"); return; }
+
+        const record = {
+          id: editingMeasurementId || uid(),
+          date,
+          unit: measureUnit,
+          neck, waist,
+          neckCm: Math.round(neckCm * 10) / 10,
+          waistCm: Math.round(waistCm * 10) / 10,
+          weightKg,
+          note
+        };
+
+        m.measurements = m.measurements || [];
+        if (editingMeasurementId) {
+          const idx = m.measurements.findIndex(r => r.id === editingMeasurementId);
+          if (idx >= 0) m.measurements[idx] = record; else m.measurements.push(record);
+        } else {
+          m.measurements.push(record);
+        }
+        saveMembers(members);
+        closeSheets();
+        editingMeasurementId = null;
+        toast("Reading saved");
+        openMemberDetail(activeMemberId);
+        if (document.getElementById("pageProgress").classList.contains("active")) openProgressPage(activeMemberId);
+      });
+
+      document.getElementById("confirmDeleteMeasurementBtn").addEventListener("click", () => {
+        const m = members.find(x => x.id === activeMemberId); if (!m) return;
+        const id = pendingDeleteMeasurementId;
+        m.measurements = (m.measurements || []).filter(r => r.id !== id);
+        saveMembers(members);
+        closeSheets();
+        toast("Reading removed");
+        openMemberDetail(activeMemberId);
+        if (document.getElementById("pageProgress").classList.contains("active")) openProgressPage(activeMemberId);
+      });
+
+      /* ===================================================================
+         v1.2 — DIET PLAN PAGE (with free-text Edit)
+         =================================================================== */
+      let dietPlanMemberId = null;
+      let dpEditing = false;
+
+      // Builds the full sendable plan message. If the member has a saved
+      // manual override, that text IS the plan everywhere (view + send)
+      // until they reset it — this is the "edit the diet plan" feature.
+      function buildDietMessage(m) {
+        if (m.dietOverrideText && m.dietOverrideText.trim()) return m.dietOverrideText;
+        const plan = dietPlanFor(m.goal, m.dietType, m.budget);
+        if (!plan) return "";
+        const lines = [];
+        lines.push(`*Diet Plan — ${settings.gymName || "Gym"}*`);
+        lines.push(`For: ${m.name}${m.age ? " · Age " + m.age : ""}`);
+        lines.push(`Goal: ${DIET_GOALS[m.goal]} · ${DIET_TYPES[m.dietType]} · ${DIET_BUDGETS[m.budget] || DIET_BUDGETS.low}`);
+        if (m.age && m.age >= 50) {
+          lines.push("Note: paced for a 50+ routine — favour lower-impact cardio and controlled lifting tempo.");
+        } else if (m.age && m.age < 18) {
+          lines.push("Note: under 18 — please review this plan with a parent/guardian and, ideally, a doctor.");
+        }
+        lines.push("");
+        plan.meals.forEach(meal => {
+          lines.push(`*${meal.time}*`);
+          lines.push(meal.items);
+          lines.push("");
+        });
+        lines.push("*Daily habits*");
+        plan.notes.forEach(n => lines.push("• " + n));
+        lines.push("");
+        if (isNewJoiner(m)) {
+          lines.push("You've just started — keep it simple for the first few weeks. Showing up regularly matters far more than getting every meal perfect.");
+          lines.push("");
+        }
+        lines.push(DIET_DISCLAIMER);
+        return lines.join("\n");
+      }
+
+      function openDietPlan(memberId) {
+        const m = members.find(x => x.id === memberId); if (!m) return;
+        const plan = dietPlanFor(m.goal, m.dietType, m.budget);
+        if (!plan) { toast("Set a goal and food preference first", "error"); return; }
+        dietPlanMemberId = memberId;
+        dpEditing = false;
+
+        const ageLine = m.age ? `<span class="goal-tag goal-tag--muted">${m.age} yrs</span>` : "";
+        const budgetLine = `<span class="goal-tag goal-tag--muted">${DIET_BUDGETS[m.budget] || DIET_BUDGETS.low}</span>`;
+        const overrideNote = (m.dietOverrideText && m.dietOverrideText.trim())
+          ? `<div style="font-size:12px;color:var(--text-2);margin-top:8px;">This plan has been manually edited. Tap Edit to change it further, or reset it from there.</div>` : "";
+
+        document.getElementById("dpHeader").innerHTML = `<div class="card">
+    <div style="font-size:17px;font-weight:800;margin-bottom:4px;">${escapeHtml(m.name)}</div>
+    <div class="fitness-card__tags" style="margin:8px 0 10px;">
+      <span class="goal-tag">${DIET_GOALS[m.goal]}</span>
+      <span class="goal-tag">${DIET_TYPES[m.dietType]}</span>
+      ${budgetLine}${ageLine}
+    </div>
+    <div style="font-size:13.5px;line-height:1.55;color:var(--text-2);">${escapeHtml(plan.headline)}</div>
+    ${overrideNote}
+    <button class="btn btn--secondary" style="margin-top:12px;" id="dpEditInfoBtn">Edit goal, diet & budget</button>
+  </div>`;
+        document.getElementById("dpEditInfoBtn").addEventListener("click", () => {
+          activeMemberId = memberId;
+          openFitnessSheet();
+        });
+
+        const hasOverride = m.dietOverrideText && m.dietOverrideText.trim();
+        if (hasOverride) {
+          // Show the manually edited text as-is, in a single readable block,
+          // instead of the structured meal cards.
+          document.getElementById("dpMeals").innerHTML = `<div class="meal-card"><div class="meal-card__body" style="white-space:pre-wrap;">${escapeHtml(m.dietOverrideText)}</div></div>`;
+          document.getElementById("dpNotes").innerHTML = "";
+          document.querySelector('#pageDietPlan .section .section__title').parentElement.style.display = "none";
+        } else {
+          document.getElementById("dpMeals").innerHTML = plan.meals.map(meal => `
+    <div class="meal-card">
+      <div class="meal-card__time">${escapeHtml(meal.time)}</div>
+      <div class="meal-card__body">${escapeHtml(meal.items)}</div>
+    </div>`).join("");
+          document.getElementById("dpNotes").innerHTML = plan.notes.map(n => `<li>${escapeHtml(n)}</li>`).join("");
+          const notesSectionTitle = document.querySelector('#pageDietPlan .section .section__title');
+          if (notesSectionTitle) notesSectionTitle.parentElement.style.display = "block";
+        }
+        document.getElementById("dpDisclaimer").textContent = DIET_DISCLAIMER;
+
+        dpShowViewMode();
+        openPage("pageDietPlan");
+      }
+
+      function dpShowViewMode() {
+        dpEditing = false;
+        document.getElementById("dpViewMode").style.display = "block";
+        document.getElementById("dpEditMode").style.display = "none";
+        document.getElementById("dpFooterView").style.display = "flex";
+        document.getElementById("dpFooterEdit").style.display = "none";
+      }
+      function dpShowEditMode() {
+        const m = members.find(x => x.id === dietPlanMemberId); if (!m) return;
+        dpEditing = true;
+        document.getElementById("dpEditTextarea").value = buildDietMessage(m);
+        document.getElementById("dpViewMode").style.display = "none";
+        document.getElementById("dpEditMode").style.display = "block";
+        document.getElementById("dpFooterView").style.display = "none";
+        document.getElementById("dpFooterEdit").style.display = "flex";
+      }
+      document.getElementById("dpEditBtn").addEventListener("click", dpShowEditMode);
+      document.getElementById("dpEditBtn2").addEventListener("click", dpShowEditMode);
+      document.getElementById("dpCancelEditBtn").addEventListener("click", () => {
+        if (dietPlanMemberId) openDietPlan(dietPlanMemberId);
+      });
+      document.getElementById("dpSaveEditBtn").addEventListener("click", () => {
+        const m = members.find(x => x.id === dietPlanMemberId); if (!m) return;
+        const text = document.getElementById("dpEditTextarea").value;
+        if (!text || !text.trim()) { toast("Plan text can't be empty", "error"); return; }
+        m.dietOverrideText = text;
+        saveMembers(members);
+        toast("Plan updated");
+        openDietPlan(dietPlanMemberId);
+      });
+      document.getElementById("dpResetBtn").addEventListener("click", () => {
+        const m = members.find(x => x.id === dietPlanMemberId); if (!m) return;
+        m.dietOverrideText = "";
+        saveMembers(members);
+        toast("Reset to auto-generated plan");
+        openDietPlan(dietPlanMemberId);
+      });
+
+      function sendDietPlan(memberId) {
+        const m = members.find(x => x.id === memberId); if (!m) return;
+        const msg = buildDietMessage(m);
+        if (!msg) { toast("Set a goal and food preference first", "error"); return; }
+        window.open(waLink(m.whatsapp, msg), "_blank");
+      }
+      document.getElementById("dpSendWhatsapp").addEventListener("click", () => {
+        if (dietPlanMemberId) sendDietPlan(dietPlanMemberId);
+      });
+
+      /* ===================================================================
+         v1.2 — PROGRESS PAGE (weight / waist trend only, no body fat)
+         =================================================================== */
+      let progressMemberId = null;
+      function openProgressPage(memberId) {
+        const m = members.find(x => x.id === memberId); if (!m) return;
+        progressMemberId = memberId;
+        activeMemberId = memberId;
+        const list = sortedMeasurements(m);
+        const hero = document.getElementById("pgHero");
+        const deltas = document.getElementById("pgDeltas");
+        const listWrap = document.getElementById("pgList");
+
+        if (list.length === 0) {
+          hero.innerHTML = `<div class="card bf-hero">
+      <div class="bf-hero__label">No readings yet</div>
+      <div style="font-size:13.5px;color:var(--text-2);line-height:1.55;margin-top:8px;">Add the first tape measurement to start tracking progress.</div>
+    </div>`;
+          deltas.innerHTML = "";
+          listWrap.innerHTML = "";
+          openPage("pageProgress");
+          return;
+        }
+
+        const first = list[0];
+        const last = list[list.length - 1];
+
+        hero.innerHTML = `<div class="card bf-hero">
+    <div class="bf-hero__value">${last.weightKg ? last.weightKg + " kg" : (last.waistCm ? Math.round(last.waistCm) + " cm waist" : "—")}</div>
+    <div class="bf-hero__label">Latest reading · ${fmtDate(last.date)}</div>
+  </div>`;
+
+        // Deltas only make sense with two or more readings.
+        if (list.length < 2) {
+          deltas.innerHTML = `<div class="card" style="font-size:13px;color:var(--text-2);line-height:1.55;">One reading recorded. Add another in 3–4 weeks to see the trend — that gap is long enough for a real change to show.</div>`;
+        } else {
+          const rows = [];
+          if (first.waistCm && last.waistCm) {
+            rows.push(deltaRow("Waist", Math.round(first.waistCm) + " cm", Math.round(last.waistCm) + " cm", Math.round((last.waistCm - first.waistCm) * 10) / 10, " cm", m.goal));
+          }
+          if (first.weightKg && last.weightKg) {
+            const d = Math.round((last.weightKg - first.weightKg) * 10) / 10;
+            rows.push(deltaRow("Weight", first.weightKg + " kg", last.weightKg + " kg", d, " kg", m.goal, m.goal === "muscle_gain"));
+          }
+          const span = daysBetween(first.date, last.date);
+          if (rows.length === 0) {
+            deltas.innerHTML = `<div class="card" style="font-size:13px;color:var(--text-2);line-height:1.55;">No comparable measurements between the first and latest reading yet.</div>`;
+          } else {
+            deltas.innerHTML = `<div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:12px;">Since the first reading${span > 0 ? ` · ${span} days` : ""}</div>
+      ${rows.join("")}
+    </div>`;
+          }
+        }
+
+        // Newest first in the list, so the most recent reading is at the top.
+        listWrap.innerHTML = list.slice().reverse().map(r => {
+          const unitTxt = r.unit === "in" ? "in" : "cm";
+          const bits = [];
+          if (r.waist) bits.push(`Waist ${r.waist}${unitTxt}`);
+          if (r.neck) bits.push(`Neck ${r.neck}${unitTxt}`);
+          if (r.weightKg) bits.push(`${r.weightKg} kg`);
+          return `<div class="measure-row">
+      <div style="flex:1;min-width:0;">
+        <div class="measure-row__date">${fmtDate(r.date)}</div>
+        <div class="measure-row__meta">${escapeHtml(bits.join(" · ") || "No measurements")}${r.note ? " · " + escapeHtml(r.note) : ""}</div>
+      </div>
+      <button class="timeline-item__iconbtn" data-edit-measurement="${r.id}" aria-label="Edit reading">${EDIT_SVG}</button>
+      <button class="timeline-item__iconbtn timeline-item__iconbtn--danger" data-delete-measurement="${r.id}" aria-label="Remove reading">${TRASH_SVG}</button>
+    </div>`;
+        }).join("");
+
+        listWrap.querySelectorAll("[data-edit-measurement]").forEach(btn => {
+          btn.addEventListener("click", () => openMeasurementSheet(memberId, btn.dataset.editMeasurement));
+        });
+        listWrap.querySelectorAll("[data-delete-measurement]").forEach(btn => {
+          btn.addEventListener("click", () => {
+            pendingDeleteMeasurementId = btn.dataset.deleteMeasurement;
+            openSheet("sheetConfirmDeleteMeasurement");
+          });
+        });
+
+        openPage("pageProgress");
+      }
+
+      function deltaRow(label, fromVal, toVal, delta, unit, goal, higherIsBetter) {
+        let cls = "delta--flat";
+        if (delta !== 0) {
+          const good = higherIsBetter ? delta > 0 : delta < 0;
+          cls = good ? "delta--good" : "delta--watch";
+        }
+        const sign = delta > 0 ? "+" : "";
+        return `<div style="display:flex;align-items:center;gap:10px;padding:7px 0;">
+    <div style="font-size:13px;font-weight:700;min-width:70px;">${escapeHtml(label)}</div>
+    <div style="font-size:12.5px;color:var(--text-2);flex:1;">${escapeHtml(fromVal)} → ${escapeHtml(toVal)}</div>
+    <div class="delta ${cls}">${sign}${delta}${unit}</div>
+  </div>`;
+      }
+
+      function buildProgressMessage(m) {
+        const list = sortedMeasurements(m);
+        if (list.length === 0) return "";
+        const first = list[0];
+        const last = list[list.length - 1];
+        const lines = [];
+        lines.push(`*Progress Report — ${settings.gymName || "Gym"}*`);
+        lines.push(m.name);
+        lines.push("");
+        if (list.length === 1) {
+          lines.push(`First reading taken on ${fmtDate(last.date)}.`);
+          if (last.waistCm) lines.push(`Waist: ${Math.round(last.waistCm)} cm`);
+          if (last.weightKg) lines.push(`Weight: ${last.weightKg} kg`);
+          lines.push("");
+          lines.push("This is the starting point. We'll measure again in 3–4 weeks and compare.");
+        } else {
+          lines.push(`${fmtDate(first.date)} → ${fmtDate(last.date)}`);
+          lines.push("");
+          if (first.waistCm && last.waistCm) {
+            const d = Math.round((last.waistCm - first.waistCm) * 10) / 10;
+            lines.push(`Waist: ${Math.round(first.waistCm)} cm → ${Math.round(last.waistCm)} cm (${d > 0 ? "+" : ""}${d} cm)`);
+          }
+          if (first.weightKg && last.weightKg) {
+            const d = Math.round((last.weightKg - first.weightKg) * 10) / 10;
+            lines.push(`Weight: ${first.weightKg} kg → ${last.weightKg} kg (${d > 0 ? "+" : ""}${d} kg)`);
+          }
+          lines.push("");
+          lines.push(progressEncouragement(m, first, last));
+        }
+        lines.push("");
+        lines.push("Tape measurements give a general sense of change, so look at the trend over weeks rather than any single reading.");
+        return lines.join("\n");
+      }
+
+      // Supportive in every direction. A flat or backwards month is framed
+      // as information, never as a failure — this message goes straight to
+      // the member, and nobody trains harder for being made to feel bad.
+      // Judged off waist and weight trends only (no body fat number).
+      function progressEncouragement(m, first, last) {
+        const goal = m.goal;
+        let waistMoved = (first.waistCm && last.waistCm) ? (last.waistCm - first.waistCm) : 0;
+
+        if (goal === "muscle_gain") {
+          const wDelta = (first.weightKg && last.weightKg) ? last.weightKg - first.weightKg : 0;
+          if (wDelta > 0.5) return "Good progress — the weight is going up steadily. Keep the meals consistent and keep adding a little to the lifts.";
+          if (wDelta < -0.5) return "Weight has come down a bit. That usually means meals are getting missed rather than anything wrong with the training. Let's look at the daily routine together.";
+          return "Holding steady. Let's add one more meal a day and check again in a few weeks.";
+        }
+        if (goal === "fat_loss") {
+          if (waistMoved < -0.5) return "Real progress, and at a healthy pace. Keep doing exactly what you're doing.";
+          if (waistMoved > 0.5) return "Numbers are up slightly this time. That happens — water, salt, sleep and stress all move it. Nothing to worry about, let's stay consistent and check again in a few weeks.";
+          return "Fairly steady this time. Small plateaus are normal. Let's look at meals and sleep and keep going.";
+        }
+        // CHANGE 2A: encouragement for the new recomp goal — looks at waist
+        // and weight together, since the point is measurements down while
+        // weight holds steady or even rises a little from muscle.
+        if (goal === "recomp") {
+          const wDelta = (first.weightKg && last.weightKg) ? last.weightKg - first.weightKg : 0;
+          if (waistMoved < -0.5 && wDelta >= -0.3) return "This is exactly what recomposition looks like — waist down while weight holds. Keep the protein and training consistent.";
+          if (waistMoved < -0.5) return "Waist is trending down, good progress. Keep protein high so the loss doesn't come from muscle.";
+          return "Recomposition is slow by nature — small or flat changes this early are completely normal. Stay consistent with training and protein.";
+        }
+        if (Math.abs(waistMoved) < 0.5) return "Nicely steady — which is exactly the goal. Good consistency.";
+        return "Numbers have shifted a little. Let's keep measuring and see what the trend says over the next few weeks.";
+      }
+
+      function sendProgressReport(memberId) {
+        const m = members.find(x => x.id === memberId); if (!m) return;
+        const msg = buildProgressMessage(m);
+        if (!msg) { toast("Add a reading first", "error"); return; }
+        window.open(waLink(m.whatsapp, msg), "_blank");
+      }
+      document.getElementById("pgSendBtn").addEventListener("click", () => {
+        if (progressMemberId) sendProgressReport(progressMemberId);
+      });
+      document.getElementById("pgAddBtn").addEventListener("click", () => {
+        if (progressMemberId) openMeasurementSheet(progressMemberId);
+      });
+
+      /* ===================================================================
          WHATSAPP HELPERS
          =================================================================== */
       function buildReminderMessage(m) {
         return settings.template
           .replace(/{name}/g, m.name)
-          .replace(/{amount}/g, fmtMoney(periodFee(m)))  // full cycle charge
+          .replace(/{amount}/g, fmtMoney(periodFee(m)))  // full cycle charge, discount included
           .replace(/{dueDate}/g, fmtDate(m.nextDueDate))
           .replace(/{gymName}/g, settings.gymName || "")
           .replace(/{plan}/g, planLabel(m));
+      }
+      // v1.2: a different tone from the fee reminder — this one is about
+      // keeping a new member going, not about money.
+      function buildWelcomeMessage(m) {
+        const d = daysSinceJoining(m);
+        const gym = settings.gymName || "the gym";
+        if (d <= 3) {
+          return `Hi ${m.name}, welcome to ${gym}! Take the first week easy — just turn up and get comfortable with the machines. Soreness in the first few days is normal. Ask me anything, any time.`;
+        }
+        if (d <= 14) {
+          return `Hi ${m.name}, you're two weeks in at ${gym} — the hardest part. Most people who get past this point stay for years. Keep showing up, even on the days you don't feel like it.`;
+        }
+        return `Hi ${m.name}, almost a month at ${gym}. That's a real habit now, and it's worth appreciating. Come see me this week and we'll look at what's next for you.`;
       }
       function waLink(phone, text) {
         return `https://wa.me/91${phone}?text=${encodeURIComponent(text)}`;
@@ -3663,6 +5308,10 @@
               const treadmillFee = Math.max(0, Number(m.treadmillFee) || 0);
               const hasTreadmill = !!m.hasTreadmill && treadmillFee > 0;
               const billingMonths = Number(m.billingMonths) === 3 ? 3 : 1;
+              // A quarterly price only carries over for quarterly members,
+              // and only when it's a sane positive number.
+              const qRaw = Number(m.quarterlyTotal) || 0;
+              const quarterlyTotal = (billingMonths === 3 && qRaw > 0 && qRaw <= 5000000) ? qRaw : 0;
               const joiningDate = isValidISODate(m.joiningDate) ? m.joiningDate : todayISO();
               const nextDueDate = isValidISODate(m.nextDueDate) ? m.nextDueDate : joiningDate;
               const payments = Array.isArray(m.payments) ? m.payments.filter(p =>
@@ -3679,15 +5328,50 @@
                 planLabel: typeof p.planLabel === "string" ? p.planLabel : undefined,
                 months: Number(p.months) === 3 ? 3 : (p.months === undefined ? undefined : 1),
                 gymFee: Number(p.gymFee) || undefined,
-                treadmillFee: Number(p.treadmillFee) || undefined
+                treadmillFee: Number(p.treadmillFee) || undefined,
+                quarterlyTotal: Number(p.quarterlyTotal) || undefined
               })) : [];
+
+              // v1.2 fitness data. Anything unrecognised is dropped rather
+              // than carried through, so a hand-edited file can't put the
+              // app into a state it doesn't know how to render.
+              const goal = ["fat_loss", "muscle_gain", "recomp", "maintenance"].includes(m.goal) ? m.goal : "";
+              const dietType = ["veg", "egg", "nonveg"].includes(m.dietType) ? m.dietType : "";
+              // CHANGE 3: budget imported, defaulting to "low" when missing/invalid
+              const budget = ["low", "medium", "high"].includes(m.budget) ? m.budget : "low";
+              const gender = ["male", "female"].includes(m.gender) ? m.gender : "";
+              const ageRaw = Number(m.age) || 0;
+              const age = (ageRaw >= 10 && ageRaw <= 100) ? Math.round(ageRaw) : 0;
+              const hRaw = Number(m.heightCm) || 0;
+              const heightCm = (hRaw >= 100 && hRaw <= 250) ? Math.round(hRaw * 10) / 10 : 0;
+              const measurements = Array.isArray(m.measurements) ? m.measurements.filter(r =>
+                r && isValidISODate(r.date)
+              ).map(r => {
+                const unit = r.unit === "in" ? "in" : "cm";
+                const neck = Number(r.neck) || 0;
+                const waist = Number(r.waist) || 0;
+                const neckCm = Number(r.neckCm) || toCm(neck, unit);
+                const waistCm = Number(r.waistCm) || toCm(waist, unit);
+                return {
+                  id: r.id || uid(),
+                  date: r.date,
+                  unit, neck, waist,
+                  neckCm: Math.round(neckCm * 10) / 10,
+                  waistCm: Math.round(waistCm * 10) / 10,
+                  weightKg: Number(r.weightKg) || 0,
+                  note: typeof r.note === "string" ? r.note.slice(0, 80) : ""
+                };
+              }) : [];
+              const dietOverrideText = typeof m.dietOverrideText === "string" ? m.dietOverrideText.slice(0, 8000) : "";
+
               const out = {
                 id: m.id || uid(), name: m.name.trim(), whatsapp,
-                gymFee, treadmillFee, hasTreadmill, billingMonths,
+                gymFee, treadmillFee, hasTreadmill, billingMonths, quarterlyTotal,
                 fee: 0,
                 joiningDate, nextDueDate,
                 status: m.status === "inactive" ? "inactive" : "active",
                 payments,
+                goal, dietType, budget, gender, age, heightCm, measurements, dietOverrideText,
                 lastReminderSentOn: isValidISODate(m.lastReminderSentOn) ? m.lastReminderSentOn : null
               };
               out.fee = monthlyFee(out);
