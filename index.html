@@ -3540,9 +3540,10 @@
 
         // Show the quarterly price box only for quarterly members.
         qField.style.display = months === 3 ? "block" : "none";
-        if (months === 3 && (!mfQuarterlyManuallySet || !qInput.value)) {
+        if (months === 3 && (!mfQuarterlyManuallySet)) {
           qInput.value = full > 0 ? full : "";
         }
+        if (!qInput.value) qHint.textContent = "Enter the price for 3 months.";
 
         if (!monthly) { hint.textContent = ""; qHint.textContent = ""; return; }
 
