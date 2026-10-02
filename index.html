@@ -2165,15 +2165,15 @@
         <div class="field">
           <label class="field__label">Plan</label>
           <div class="segmented" id="mfPlanSeg" style="margin:0;">
-            <button type="button" class="segmented__opt active" data-plan="gym">Gym only</button>
-            <button type="button" class="segmented__opt" data-plan="gym_treadmill">Gym + Treadmill</button>
+            <button type="button" class="segmented__opt active" data-plan="gym">Gym membership</button>
+            <button type="button" class="segmented__opt" data-plan="gym_treadmill">Treadmill</button>
           </div>
         </div>
         <div class="field" id="mfTreadmillField" style="display:none;">
           <label class="field__label">Monthly treadmill fee</label>
           <div class="field__prefix-input">
             <span class="field__prefix">₹</span>
-            <input id="mfTreadmillFee" type="number" inputmode="decimal" placeholder="200" min="1" step="1">
+            <input id="mfTreadmillFee" type="number" inputmode="decimal" placeholder="200" min="0" step="1">
           </div>
         </div>
         <div class="field">
@@ -2349,6 +2349,8 @@
               id="rcJoiningDate">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Paid On</span><span class="receipt-row__value"
               id="rcDate">—</span></div>
+          <div class="receipt-row" id="rcMethodRow" style="display:none;"><span class="receipt-row__label">Received
+              Via</span><span class="receipt-row__value" id="rcMethod">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Period Covered</span><span
               class="receipt-row__value" id="rcPeriod">—</span></div>
           <div class="receipt-row"><span class="receipt-row__label">Next Due Date</span><span class="receipt-row__value"
@@ -2576,7 +2578,6 @@
       <div class="btn-row"><button class="btn btn--secondary" data-close-sheet>Cancel</button><button
           class="btn btn--danger" id="confirmDeleteBtn">Delete</button></div>
     </div>
-
     <div class="sheet" id="sheetMarkPaid" data-sheet>
       <div class="sheet__handle"></div>
       <div class="sheet__title" id="smpTitle">Confirm payment</div>
@@ -2591,6 +2592,13 @@
         <input class="field__input" id="smpPaidOn" type="date">
         <div class="field__hint" id="smpPaidOnHint">All dates are pre-filled automatically based on the billing rule
           and the current due date. Edit any of them if they aren't right for this payment.</div>
+      </div>
+      <div class="field">
+        <label class="field__label">Payment Received Via</label>
+        <div class="segmented" id="smpMethodSeg" style="margin:0;">
+          <button type="button" class="segmented__opt active" data-method="Online">Online</button>
+          <button type="button" class="segmented__opt" data-method="Cash">Cash</button>
+        </div>
       </div>
       <div class="field">
         <label class="field__label">Period covered — start</label>
@@ -3670,10 +3678,10 @@
         if (!isValidIndianMobile(whatsapp)) {
           toast("Enter a valid 10-digit WhatsApp number", "error"); return;
         }
-        if (!gymFee || gymFee <= 0 || gymFee > 1000000) {
+        if (!gymFee || gymFee < 0 || gymFee > 1000000) {
           toast("Gym fee must be a positive amount", "error"); return;
         }
-        if (hasTreadmill && (isNaN(treadmillFee) || treadmillFee <= 0 || treadmillFee > 1000000)) {
+        if (hasTreadmill && (isNaN(treadmillFee) || treadmillFee < 0 || treadmillFee > 1000000)) {
           toast("Enter a valid treadmill fee, or switch the plan to Gym only", "error"); return;
         }
         let quarterlyTotal = 0;
@@ -4049,7 +4057,7 @@
         <div class="timeline-item__dot" data-payment-id="${p.id}" style="cursor:pointer;">${CHECK_SVG}</div>
         <div style="flex:1;cursor:pointer;" data-payment-id="${p.id}">
           <div class="timeline-item__title">Payment received${isMostRecent ? '<span class="latest-payment-badge">Latest</span>' : ''}</div>
-          <div class="timeline-item__meta">${fmtDate(p.paidOn)} · Receipt #${p.receiptNo}${p.planLabel ? " · " + escapeHtml(p.planLabel) : ""}</div>
+          <div class="timeline-item__meta">${fmtDate(p.paidOn)} · Receipt #${p.receiptNo}${p.planLabel ? " · " + escapeHtml(p.planLabel) : ""}${p.paymentMethod ? " · " + escapeHtml(p.paymentMethod) : ""}</div>
         </div>
         <div class="timeline-item__amount" data-payment-id="${p.id}" style="cursor:pointer;">${fmtMoney(p.amount)}</div>
         ${isMostRecent ? `<div class="timeline-item__actions">
@@ -4249,6 +4257,7 @@
         document.getElementById("smpPaidOnHint").textContent = "Paid on is just a record of when the money arrived — it doesn't affect the period or next due date below. Those follow the billing cycle, so late payments don't shift it.";
 
         document.getElementById("smpPaidOn").value = todayISO();
+        smpSetMethod("Online");
         refreshMarkPaidPreview(m.nextDueDate, months);
 
         openSheet("sheetMarkPaid");
@@ -4269,13 +4278,23 @@
         document.getElementById("smpDesc").textContent = `Editing ${m.name}'s payment recorded on ${fmtDate(p.paidOn)} (Receipt #${p.receiptNo}).`;
         document.getElementById("smpAmount").value = p.amount;
         document.getElementById("smpPaidOn").value = p.paidOn;
+        smpSetMethod(p.paymentMethod || ""); // old payments: nothing preselected
         document.getElementById("smpPeriodStart").value = p.periodStart;
         document.getElementById("smpPeriodEnd").value = p.periodEnd;
         document.getElementById("smpNextDueDate").value = p.nextDueDate;
         document.getElementById("smpPaidOnHint").textContent = "Paid on is just a record of when the money arrived — changing it won't recalculate the period or next due date below. Edit those directly if they need to change too.";
         openSheet("sheetMarkPaid");
       }
-
+      function smpSetMethod(v) {
+        document.querySelectorAll("#smpMethodSeg .segmented__opt").forEach(b => b.classList.toggle("active", b.dataset.method === v));
+      }
+      function smpGetMethod() {
+        const b = document.querySelector("#smpMethodSeg .segmented__opt.active");
+        return b ? b.dataset.method : "";
+      }
+      document.getElementById("smpMethodSeg").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-method]"); if (b) smpSetMethod(b.dataset.method);
+      });
       // "Paid on" is a record of WHEN money arrived, not WHAT it's for, so
       // it must never silently recalculate period/next-due-date.
       document.getElementById("smpPaidOn").addEventListener("change", () => { /* intentionally no-op: see comment above */ });
@@ -4323,6 +4342,7 @@
           const p = (m.payments || []).find(x => x.id === editingPaymentId);
           if (!p) { toast("Payment not found", "error"); closeSheets(); return; }
           p.amount = amount; p.paidOn = paidOn; p.periodStart = periodStart; p.periodEnd = periodEnd; p.nextDueDate = nextDueDate;
+          const pm = smpGetMethod(); if (pm) p.paymentMethod = pm; // old payments stay untouched if nothing chosen
           m.nextDueDate = nextDueDate;
           saveMembers(members);
           closeSheets();
@@ -4342,6 +4362,7 @@
         // cycle.
         const payment = {
           id: uid(), amount, paidOn, periodStart, periodEnd, nextDueDate, receiptNo,
+          paymentMethod: smpGetMethod() || "Online",
           planLabel: planLabel(m),
           months: cycleMonths(m),
           gymFee: Number(m.gymFee || 0),
@@ -5117,7 +5138,7 @@
       }
       function receiptShareText(member, payment) {
         const nextDue = payment.nextDueDate || addDaysISO(payment.periodEnd, 1);
-        return `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nPlan: ${receiptPlanText(member, payment)}\nJoining Date: ${fmtDate(member.joiningDate)}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
+        return `Payment Receipt — ${settings.gymName}\nReceipt No: ${payment.receiptNo}\nMember: ${member.name}\nPlan: ${receiptPlanText(member, payment)}\nJoining Date: ${fmtDate(member.joiningDate)}\nAmount Paid: ${fmtMoney(payment.amount)}\nPaid On: ${fmtDate(payment.paidOn)}\n${payment.paymentMethod ? "Received Via: " + payment.paymentMethod + "\n" : ""}\nPeriod: ${fmtDate(payment.periodStart)} - ${fmtDate(payment.periodEnd)}\nNext Due: ${fmtDate(nextDue)}\nThank you!`;
       }
       function openReceipt(m, payment) {
         // Always re-fetch the live member record by id so the receipt can
@@ -5133,6 +5154,9 @@
         if (planEl) planEl.textContent = receiptPlanText(liveMember, payment);
         document.getElementById("rcJoiningDate").textContent = fmtDate(liveMember.joiningDate);
         document.getElementById("rcDate").textContent = fmtDate(payment.paidOn);
+        const mr = document.getElementById("rcMethodRow");
+        if (payment.paymentMethod) { mr.style.display = "flex"; document.getElementById("rcMethod").textContent = payment.paymentMethod; }
+        else { mr.style.display = "none"; }
         document.getElementById("rcPeriod").textContent = fmtDate(payment.periodStart) + " – " + fmtDate(payment.periodEnd);
         document.getElementById("rcNextDue").textContent = fmtDate(nextDue);
         document.getElementById("rcFooter").textContent = "Thank you for your payment! · " + (settings.gymName || "");
@@ -5330,7 +5354,8 @@
                 months: Number(p.months) === 3 ? 3 : (p.months === undefined ? undefined : 1),
                 gymFee: Number(p.gymFee) || undefined,
                 treadmillFee: Number(p.treadmillFee) || undefined,
-                quarterlyTotal: Number(p.quarterlyTotal) || undefined
+                quarterlyTotal: Number(p.quarterlyTotal) || undefined,
+                paymentMethod: ["Online", "Cash"].includes(p.paymentMethod) ? p.paymentMethod : undefined
               })) : [];
 
               // v1.2 fitness data. Anything unrecognised is dropped rather
