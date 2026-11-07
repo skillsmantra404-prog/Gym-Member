@@ -30,10 +30,24 @@ jobs:
 
       - name: Prepare deployment folder
         run: |
-          mkdir -p dist/assets
-          cp manifest.json dist/
-          cp service-worker.js dist/
-          cp -r assets/. dist/assets/
+          # Ensure deployment structure exists
+          mkdir -p dist/assets/icons
+
+          # Copy PWA configuration
+          cp manifest.json dist/manifest.json
+          cp service-worker.js dist/service-worker.js
+
+          # Copy icons to expected PWA paths
+          cp icon-192.png dist/assets/icons/
+          cp icon-512.png dist/assets/icons/
+          cp icon-maskable-512.png dist/assets/icons/
+          cp favicon-32.png dist/assets/icons/
+
+          # Verify website entry point
+          test -f dist/index.html
+
+          echo "Deployment files:"
+          find dist -maxdepth 4 -type f | sort
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
