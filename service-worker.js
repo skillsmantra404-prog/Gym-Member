@@ -1,4 +1,3 @@
-ervice worker · JS
 /* Gym Manager service worker — self-updating, offline-capable.
  * - Pages (HTML) and manifest: NETWORK FIRST, so every new deploy shows up on the next open. Cache is only the offline fallback.
  * - Icons / other same-site files: serve from cache instantly, refresh in the background.
@@ -11,13 +10,13 @@ const CORE = ['./', './index.html', './manifest.json',
   './assets/icons/icon-192.png', './assets/icons/icon-512.png',
   './assets/icons/icon-maskable-512.png', './assets/icons/favicon-32.png'];
 const NET_TIMEOUT = 4000; // slow network: fall back to the saved copy after 4s
- 
+
 self.addEventListener('install', e => {
   self.skipWaiting(); // activate the new worker immediately
   e.waitUntil(caches.open(CACHE).then(c =>
     Promise.all(CORE.map(u => c.add(new Request(u, { cache: 'reload' })).catch(() => {})))));
 });
- 
+
 self.addEventListener('activate', e => {
   e.waitUntil((async () => {
     const old = (await caches.keys()).filter(k => k !== CACHE);
@@ -30,7 +29,7 @@ self.addEventListener('activate', e => {
     }
   })());
 });
- 
+
 function networkFirst(req) {
   return new Promise(resolve => {
     let done = false;
@@ -46,7 +45,7 @@ function networkFirst(req) {
     });
   });
 }
- 
+
 function staleWhileRevalidate(req) {
   return caches.match(req).then(hit => {
     const net = fetch(req).then(res => {
@@ -56,7 +55,7 @@ function staleWhileRevalidate(req) {
     return hit || net;
   });
 }
- 
+
 self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
